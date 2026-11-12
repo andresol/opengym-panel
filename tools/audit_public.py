@@ -2,6 +2,7 @@
 """Fail publication on common secret/private-data artifacts. Not a security audit."""
 from pathlib import Path
 import hashlib
+import io
 import json
 import re
 import struct
@@ -26,14 +27,23 @@ def approved_documentation_image(path, content):
     if not manifest.is_file():
         return False
     entry = json.loads(manifest.read_text()).get("images", {}).get(path.relative_to(ROOT).as_posix())
-    if not entry or path.suffix != ".png":
-        return False
-    relative = path.relative_to(ROOT).as_posix()
-    if entry.get("kind") == "synthetic-native-lvgl-desktop-render":
-        expected_size = (1280, 800)
-    elif entry.get("kind") == "original-ai-exercise-illustration" and relative == "docs/images/barbell-squat-original.png":
-        expected_size = (1536, 1024)
-    else:
+    if (entry and path.relative_to(ROOT).as_posix() == "docs/images/panel-in-use.jpg"
+            and entry.get("kind") == "authorized-maintainer-installation-photograph"):
+        if hashlib.sha256(content).hexdigest() != entry.get("sha256") or not content.endswith(b"\xff\xd9"):
+            return False
+        from PIL import Image
+        try:
+            with Image.open(io.BytesIO(content)) as photo:
+                if (photo.format != "JPEG" or photo.size != (900, 1200) or
+                        photo.size != (entry.get("width"), entry.get("height")) or
+                        photo.getexif() or set(photo.info) -
+                        {"jfif", "jfif_version", "jfif_unit", "jfif_density", "dpi"}):
+                    return False
+                photo.verify()
+        except (OSError, ValueError):
+            return False
+        return True
+    if not entry or path.suffix != ".png" or entry.get("kind") != "synthetic-native-lvgl-desktop-render":
         return False
     if hashlib.sha256(content).hexdigest() != entry.get("sha256") or not content.startswith(b"\x89PNG\r\n\x1a\n"):
         return False
@@ -48,7 +58,7 @@ def approved_documentation_image(path, content):
             if size != 13:
                 return False
             width, height = struct.unpack(">II", content[offset + 8:offset + 16])
-            if (width, height) != (entry.get("width"), entry.get("height")) or (width, height) != expected_size:
+            if (width, height) != (entry.get("width"), entry.get("height")) or (width, height) != (1280, 800):
                 return False
         offset += 12 + size
         if kind == b"IEND":
@@ -68,7 +78,7 @@ def audit(paths):
     for path in paths:
         relative = path.relative_to(ROOT)
         name = relative.as_posix()
-        if not path.is_symlink() and name.startswith("docs/images/") and path.suffix == ".png":
+        if not path.is_symlink() and name.startswith("docs/images/") and path.suffix in {".png", ".jpg"}:
             if not approved_documentation_image(path, path.read_bytes()):
                 problems.append((name, "unapproved or metadata-bearing documentation image"))
             continue

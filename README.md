@@ -11,22 +11,16 @@ OpenGym product.
 
 ## Screenshots
 
-Native LVGL interface rendered on a desktop with **synthetic profiles and workout
-data**. These are not photographs or captured ESP32 framebuffers. The workout
-example uses an original AI-generated squat illustration to demonstrate optional
-installer-supplied media. No Gym visual artwork is included. The adapter's
-runtime default remains the neutral placeholder until you configure your own media.
+**Actual installed panel, photographed by the maintainer.** This is the real
+interface and exercise illustration as displayed, not an AI image or UI mockup.
+The maintainer explicitly provided and approved this photo for the README.
 
-![Workout view with an original barbell-squat illustration, synthetic set results and rest timer](docs/images/workout.png)
+<img src="docs/images/panel-in-use.jpg" alt="Actual wall-mounted OpenGym panel showing the maintainer's installed Romanian deadlift workout view" width="720">
 
-<details>
-<summary>Profile selector</summary>
-
-![Profile selector with four fictional demonstration profiles](docs/images/profiles.png)
-
-</details>
-
-See [render provenance and reproduction](docs/DEVELOPMENT.md#readme-renders).
+The photo shows an existing configured installation with optional exercise media.
+The visible exercise artwork has separate third-party rights; it is **not AGPL
+artwork or a reusable media pack**. See [photo and artwork notice](docs/images/PHOTO-NOTICE.md).
+The generic installer still uses its neutral placeholder by default.
 
 ## What it does
 

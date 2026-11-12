@@ -23,17 +23,15 @@ are separate results. CI never flashes a device or changes training data.
 
 ## README renders
 
+The main README now uses the maintainer's explicitly authorized **real installation
+photo**, not these synthetic developer renders. Do not replace actual exercise
+artwork with an AI imitation. See [photo provenance and rights](images/PHOTO-NOTICE.md).
+
 README PNGs are off-device LVGL renders with synthetic profiles, loads and session
 state. They are not photographs, captured ESP32 framebuffers or physical touch
 acceptance. Native widget construction/render methods and the bundled font are
 used; network, hardware and session storage are not connected. The optional
 muscle-map popup is outside this documentation harness.
-
-The workout render includes an original AI-generated squat illustration to show
-what optional installer-supplied media looks like. Its [asset and generation
-provenance](images/README.md) are included for reproducibility. This documentation
-example does not change the adapter's runtime placeholder default or install
-anything on a device.
 
 To reproduce, provide a host-built LVGL **9.5.0** with snapshot/RGB888 support
 and its matching configuration. Install `Pillow` and `freetype-py` in an isolated

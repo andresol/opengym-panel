@@ -1,14 +1,12 @@
 # Illustrations and media rights
 
-The README's squat illustration is an original AI-generated documentation asset,
-not a Gym visual image. See [its provenance](images/README.md). It demonstrates
-optional installer-supplied media; it is not installed or selected automatically,
-and it is not an exercise-animation library.
-
 The software licence and the exercise-media licence are different.
 
-The community edition includes **no Gym visual photos, stills, GIFs, animations
-or video**. It does not download, hotlink or extract them from OpenGym containers
+The community edition includes **no standalone Gym visual photos, stills, GIFs,
+animations or video files**. The maintainer's expressly authorized README photo
+shows a real configured installation; visible third-party artwork is covered by
+the [separate photo notice](images/PHOTO-NOTICE.md), not by the code's AGPL.
+The installer does not download, hotlink or extract media from OpenGym containers
 or a running server. The adapter's default `mediaMode` is `placeholder`, returning
 original geometric dumbbell artwork in the normal bounded display format. The
 workout name, target sets and muscle map still describe the selected exercise;

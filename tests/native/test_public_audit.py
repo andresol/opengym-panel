@@ -1,6 +1,7 @@
 """Documentation PNGs must not become a general media/metadata audit bypass."""
 import hashlib
 import importlib.util
+import io
 import json
 from pathlib import Path
 import struct
@@ -52,20 +53,34 @@ class DocumentationImageAuditTest(unittest.TestCase):
             path.write_bytes(self.png)
             self.assertTrue(audit.audit([path]))
 
-    def test_original_demo_artwork_has_one_explicit_approved_path(self):
-        name = "docs/images/barbell-squat-original.png"
-        content = (Path(__file__).parents[2] / name).read_bytes()
+    def approve_photo(self, content):
+        name = "docs/images/panel-in-use.jpg"
         path = self.root / name
         path.write_bytes(content)
         manifest_path = self.root / "docs/images/manifest.json"
         manifest = json.loads(manifest_path.read_text())
         manifest["images"][name] = {"sha256": hashlib.sha256(content).hexdigest(),
-            "width": 1536, "height": 1024, "kind": "original-ai-exercise-illustration"}
+            "width": 900, "height": 1200, "kind": "authorized-maintainer-installation-photograph"}
         manifest_path.write_text(json.dumps(manifest))
+        return path
+
+    def test_only_exact_authorized_photo_without_metadata_passes(self):
+        content = (Path(__file__).parents[2] / "docs/images/panel-in-use.jpg").read_bytes()
+        path = self.approve_photo(content)
         self.assertEqual(audit.audit([path]), [])
-        copied = path.with_name("unreviewed-artwork.png")
-        copied.write_bytes(content)
-        self.assertTrue(audit.audit([copied]))
+        other = path.with_name("another-real-photo.jpg")
+        other.write_bytes(content)
+        self.assertTrue(audit.audit([other]))
+
+    def test_hash_approved_photo_with_exif_is_rejected(self):
+        from PIL import Image
+        photo = Image.open(Path(__file__).parents[2] / "docs/images/panel-in-use.jpg")
+        exif = Image.Exif()
+        exif[315] = "SYNTHETIC-PRIVATE-METADATA"
+        output = io.BytesIO()
+        photo.save(output, format="JPEG", exif=exif)
+        path = self.approve_photo(output.getvalue())
+        self.assertTrue(audit.audit([path]))
 
 
 if __name__ == "__main__":

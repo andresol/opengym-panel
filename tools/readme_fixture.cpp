@@ -27,7 +27,6 @@ void enabled(lv_obj_t *object, bool enable) {
   else lv_obj_add_state(object, LV_STATE_DISABLED);
 }
 /* FONT_DATA */
-/* EXERCISE_IMAGE_DATA */
 /* STRUCTURES */
 class GymNative {
  public:
@@ -141,12 +140,14 @@ int main() {
   gym.timer_.toggle(millis(), 90);
   gym.render_plan();
   hidden(gym.media_empty_, true);
-  // Original README artwork demonstrates installer-supplied owned media. This
-  // documentation harness does not change the adapter's placeholder default.
-  prepare_illustration();
-  lv_image_set_src(gym.media_image_, &readme_illustration);
-  hidden(gym.media_viewport_, false);
-  hidden(gym.media_image_, false);
+  // The community adapter's original geometric placeholder, not exercise media.
+  for (int x : {164, 188, 300, 324}) {
+    auto *plate = gym.box(gym.media_stage_, 64 + x, 110, 24, 122, 0xb8ee56);
+    lv_obj_set_style_radius(plate, 6, 0);
+  }
+  gym.box(gym.media_stage_, 264, 166, 112, 12, 0xb8ee56);
+  auto *placeholder = gym.label(gym.media_stage_, "No exercise illustration", 64, 274, 512, 24, &f16, TEXT);
+  lv_obj_set_style_text_align(placeholder, LV_TEXT_ALIGN_CENTER, 0);
   snapshot(root, "workout.rgb");
   lv_display_delete(display);
   lv_deinit();

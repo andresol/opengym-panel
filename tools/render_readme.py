@@ -78,33 +78,12 @@ def main():
     methods += between(ui, "void GymNative::render_session(", "void GymNative::session_action(")
     people = between(cpp, "  for (size_t i = 0; i < people_.size(); ++i) {", '  update_status("");')
     structures = between(header, "struct Person {", "class GymNative :")
-    from PIL import Image, ImageOps
-    illustration_path = ROOT / "docs/images/barbell-squat-original.png"
-    original = Image.open(illustration_path).convert("RGBA")
-    fitted = ImageOps.contain(original, (512, 360), Image.Resampling.LANCZOS)
-    canvas = Image.new("RGBA", (512, 360), "#17191b")
-    canvas.alpha_composite(fitted, ((512 - fitted.width) // 2, (360 - fitted.height) // 2))
-    # This is the native viewport's rendering input, not an edited source asset.
-    pixels = canvas.convert("RGB").tobytes("raw", "BGR")
-    illustration = "static const unsigned char readme_pixels[]={" + ",".join(map(str, pixels)) + "};"
-    illustration += r"""
-static lv_image_dsc_t readme_illustration;
-static void prepare_illustration() {
-  readme_illustration.header.magic = LV_IMAGE_HEADER_MAGIC;
-  readme_illustration.header.cf = LV_COLOR_FORMAT_RGB888;
-  readme_illustration.header.w = 512;
-  readme_illustration.header.h = 360;
-  readme_illustration.header.stride = 512 * 3;
-  readme_illustration.data_size = sizeof(readme_pixels);
-  readme_illustration.data = readme_pixels;
-}
-"""
     font_data, font_init = fonts()
     source = (ROOT / "tools/readme_fixture.cpp").read_text()
     for marker, value in [("FONT_DATA", font_data), ("FONT_INIT", font_init),
-                          ("STRUCTURES", structures), ("METHODS", methods), ("PEOPLE", people),
-                          ("EXERCISE_IMAGE_DATA", illustration)]:
+                          ("STRUCTURES", structures), ("METHODS", methods), ("PEOPLE", people)]:
         source = source.replace("/* " + marker + " */", value)
+    from PIL import Image
     output = ROOT / "docs/images"
     output.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="opengym-readme-") as folder:
@@ -130,17 +109,24 @@ static void prepare_illustration() {
                 "kind": "synthetic-native-lvgl-desktop-render",
             }
         assert set(images) == {"docs/images/profiles.png", "docs/images/workout.png"}
-        images[illustration_path.relative_to(ROOT).as_posix()] = {
-            "sha256": hashlib.sha256(illustration_path.read_bytes()).hexdigest(),
-            "width": original.width, "height": original.height,
-            "kind": "original-ai-exercise-illustration",
-        }
+        # Keep the separately authorized real photograph's reviewed receipt.
+        # Rendering synthetic developer fixtures must not approve a changed photo.
+        manifest_path = output / "manifest.json"
+        if manifest_path.exists():
+            old_images = json.loads(manifest_path.read_text()).get("images", {})
+            photo_name = "docs/images/panel-in-use.jpg"
+            if photo_name in old_images:
+                entry = old_images[photo_name]
+                assert hashlib.sha256((ROOT / photo_name).read_bytes()).hexdigest() == entry["sha256"]
+                images[photo_name] = entry
         provenance = {path.relative_to(ROOT).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
                       for path in [COMPONENT / "gym_native.cpp", COMPONENT / "gym_native.h",
                                    COMPONENT / "workout_ui.cpp", ROOT / "tools/readme_fixture.cpp",
-                                   ROOT / "tools/render_readme.py", illustration_path]}
+                                   ROOT / "tools/render_readme.py"]}
         (output / "manifest.json").write_text(json.dumps({"schema": 1, "images": images,
-            "source_hashes": provenance, "real_user_data": False, "hardware_capture": False,
+            "source_hashes": provenance, "real_user_data_in_synthetic_renders": False,
+            "authorized_real_photo_included": "docs/images/panel-in-use.jpg" in images,
+            "hardware_framebuffer_capture": False,
             "network_access": False, "restricted_exercise_media": False}, indent=2) + "\n")
         print("Rendered two offline synthetic native-LVGL images; review before publishing.")
 
