@@ -8,7 +8,7 @@ private tooling blocks unresolved source conflicts and unclassified additions.
 Generic installation defaults are not a copy of a household setup: DHCP,
 authenticated administration, explicit optional equipment tables and original
 placeholder media remain the defaults here. Private credentials, user data,
-provisioned firmware, restricted media and private Git history stay outside this
+provisioned firmware, standalone restricted media and private Git history stay outside this
 repository. Public contributions are tested here before the maintainer ports
 them to the production source; no blind bidirectional directory mirroring is used.
 
@@ -23,9 +23,9 @@ are separate results. CI never flashes a device or changes training data.
 
 ## README renders
 
-The main README now uses the maintainer's explicitly authorized **real installation
-photo**, not these synthetic developer renders. Do not replace actual exercise
-artwork with an AI imitation. See [photo provenance and rights](images/PHOTO-NOTICE.md).
+The main README uses clean native renders with fictional profiles and workout
+values, not the maintainer's installation photo. The workout render shows the
+original exercise still, not an AI imitation. See [provenance and rights](images/RENDER-NOTICE.md).
 
 README PNGs are off-device LVGL renders with synthetic profiles, loads and session
 state. They are not photographs, captured ESP32 framebuffers or physical touch
@@ -43,6 +43,14 @@ python3 tools/render_readme.py \
   --lvgl-library /path/to/build/lib/liblvgl.a \
   --lvgl-config /path/to/lv_conf.h
 ```
+
+Without `--exercise-image`, the workout render uses the generic placeholder.
+To reproduce the documented optional-media view, add `--exercise-image` pointing
+to a lawfully supplied barbell-full-squat still (catalogue ID `0043`). The existing
+native adapter converts it to the screen's 512×360 RGB565 still format. Only the
+complete interface render is written to documentation; the input asset is never
+copied into this repository or downloaded by the renderer. The original artwork
+has separate rights, and this tooling does not grant a licence to acquire it.
 
 Review every PNG and its fixture/source provenance before committing its hash
 in `docs/images/manifest.json`. The public artifact audit allows only those

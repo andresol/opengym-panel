@@ -11,6 +11,8 @@
 #include <array>
 #include <cassert>
 #include <cstdio>
+#include <cstring>
+#include "media_format.h"
 #include <string>
 #include <vector>
 using namespace esphome::gym_native;
@@ -92,7 +94,7 @@ void snapshot(lv_obj_t *root, const char *name) {
   lv_draw_buf_destroy(buffer);
 }
 
-int main() {
+int main(int argc, char **argv) {
   lv_init();
   /* FONT_INIT */
   auto *display = lv_display_create(1280, 800);
@@ -140,14 +142,39 @@ int main() {
   gym.timer_.toggle(millis(), 90);
   gym.render_plan();
   hidden(gym.media_empty_, true);
-  // The community adapter's original geometric placeholder, not exercise media.
-  for (int x : {164, 188, 300, 324}) {
-    auto *plate = gym.box(gym.media_stage_, 64 + x, 110, 24, 122, 0xb8ee56);
-    lv_obj_set_style_radius(plate, 6, 0);
+  std::vector<unsigned char> media;
+  lv_image_dsc_t descriptor{};
+  if (argc == 2) {
+    FILE *file = fopen(argv[1], "rb");
+    assert(file);
+    media.resize(12 + 512 * 360 * 2);
+    assert(fread(media.data(), 1, media.size(), file) == media.size());
+    assert(fgetc(file) == EOF);
+    fclose(file);
+    assert(valid_media(media.data(), media.size()));
+    // Same descriptor, scaling and viewport as GymNative::accept_media/show_frame.
+    descriptor.header.magic = LV_IMAGE_HEADER_MAGIC;
+    descriptor.header.cf = LV_COLOR_FORMAT_RGB565;
+    descriptor.header.w = 512;
+    descriptor.header.h = 360;
+    descriptor.header.stride = 512 * 2;
+    descriptor.data_size = 512 * 360 * 2;
+    descriptor.data = media.data() + 12;
+    lv_image_set_src(gym.media_image_, &descriptor);
+    lv_image_set_scale(gym.media_image_, 256);
+    lv_obj_center(gym.media_image_);
+    hidden(gym.media_viewport_, false);
+    hidden(gym.media_image_, false);
+  } else {
+    // The adapter's original placeholder, used only without a supplied still.
+    for (int x : {164, 188, 300, 324}) {
+      auto *plate = gym.box(gym.media_stage_, 64 + x, 110, 24, 122, 0xb8ee56);
+      lv_obj_set_style_radius(plate, 6, 0);
+    }
+    gym.box(gym.media_stage_, 264, 166, 112, 12, 0xb8ee56);
+    auto *placeholder = gym.label(gym.media_stage_, "No exercise illustration", 64, 274, 512, 24, &f16, TEXT);
+    lv_obj_set_style_text_align(placeholder, LV_TEXT_ALIGN_CENTER, 0);
   }
-  gym.box(gym.media_stage_, 264, 166, 112, 12, 0xb8ee56);
-  auto *placeholder = gym.label(gym.media_stage_, "No exercise illustration", 64, 274, 512, 24, &f16, TEXT);
-  lv_obj_set_style_text_align(placeholder, LV_TEXT_ALIGN_CENTER, 0);
   snapshot(root, "workout.rgb");
   lv_display_delete(display);
   lv_deinit();

@@ -2,6 +2,7 @@
 """Render native LVGL documentation fixtures offline; never connects to a device."""
 import argparse
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import subprocess
@@ -68,6 +69,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ["lvgl-include", "lvgl-library", "lvgl-config"]:
         parser.add_argument("--" + name, required=True, type=Path)
+    parser.add_argument("--exercise-image", type=Path,
+                        help="Optional lawfully supplied squat still; never downloaded or copied to public source")
     args = parser.parse_args()
     cpp = (COMPONENT / "gym_native.cpp").read_text()
     ui = (COMPONENT / "workout_ui.cpp").read_text()
@@ -89,11 +92,25 @@ def main():
     with tempfile.TemporaryDirectory(prefix="opengym-readme-") as folder:
         temporary = Path(folder)
         (temporary / "render.cpp").write_text(source)
+        command = [str(temporary / "render")]
+        artwork = None
+        if args.exercise_image:
+            spec = importlib.util.spec_from_file_location("native_media", ROOT / "native/server.py")
+            adapter = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(adapter)
+            original = args.exercise_image.read_bytes()
+            frame = temporary / "exercise.gym"
+            frame.write_bytes(adapter.convert_media(original))
+            command.append(str(frame))
+            artwork = {"exercise": "barbell full squat", "catalogue_id": "0043",
+                       "source_sha256": hashlib.sha256(original).hexdigest(),
+                       "processing": "Unchanged native adapter RGB565 still conversion and LVGL image binding",
+                       "rights": "Separate third-party rights; see RENDER-NOTICE.md"}
         subprocess.run(["g++", "-std=c++17", "-I" + str(args.lvgl_include.resolve()),
                         "-I" + str(COMPONENT), '-DLV_CONF_PATH="' + str(args.lvgl_config.resolve()) + '"',
                         str(temporary / "render.cpp"), str(args.lvgl_library.resolve()),
                         "-lm", "-o", str(temporary / "render")], check=True)
-        result = subprocess.check_output([str(temporary / "render")], cwd=temporary, text=True)
+        result = subprocess.check_output(command, cwd=temporary, text=True)
         images = {}
         for line in result.splitlines():
             if not line.startswith("snapshot "):
@@ -109,26 +126,19 @@ def main():
                 "kind": "synthetic-native-lvgl-desktop-render",
             }
         assert set(images) == {"docs/images/profiles.png", "docs/images/workout.png"}
-        # Keep the separately authorized real photograph's reviewed receipt.
-        # Rendering synthetic developer fixtures must not approve a changed photo.
-        manifest_path = output / "manifest.json"
-        if manifest_path.exists():
-            old_images = json.loads(manifest_path.read_text()).get("images", {})
-            photo_name = "docs/images/panel-in-use.jpg"
-            if photo_name in old_images:
-                entry = old_images[photo_name]
-                assert hashlib.sha256((ROOT / photo_name).read_bytes()).hexdigest() == entry["sha256"]
-                images[photo_name] = entry
+        if artwork:
+            images["docs/images/workout.png"]["exercise_artwork"] = artwork
         provenance = {path.relative_to(ROOT).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
                       for path in [COMPONENT / "gym_native.cpp", COMPONENT / "gym_native.h",
                                    COMPONENT / "workout_ui.cpp", ROOT / "tools/readme_fixture.cpp",
-                                   ROOT / "tools/render_readme.py"]}
+                                   ROOT / "tools/render_readme.py", ROOT / "native/server.py"]}
         (output / "manifest.json").write_text(json.dumps({"schema": 1, "images": images,
             "source_hashes": provenance, "real_user_data_in_synthetic_renders": False,
-            "authorized_real_photo_included": "docs/images/panel-in-use.jpg" in images,
+            "authorized_real_photo_included": False,
             "hardware_framebuffer_capture": False,
-            "network_access": False, "restricted_exercise_media": False}, indent=2) + "\n")
-        print("Rendered two offline synthetic native-LVGL images; review before publishing.")
+            "network_access": False, "restricted_exercise_media_visible": bool(artwork),
+            "standalone_restricted_media_included": False}, indent=2) + "\n")
+        print("Rendered two offline native-LVGL views with example data; review before publishing.")
 
 
 if __name__ == "__main__":

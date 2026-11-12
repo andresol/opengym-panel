@@ -8,29 +8,31 @@
       "kind": "synthetic-native-lvgl-desktop-render"
     },
     "docs/images/workout.png": {
-      "sha256": "d439fc9ca88e51b73c1cab370bd6ef8bd362b1a5aae556efac3babf92827957c",
+      "sha256": "483e446d7672b5e8b81656dea3a4bfc23b54c50677d8cb49d4e895aecf18017a",
       "width": 1280,
       "height": 800,
-      "kind": "synthetic-native-lvgl-desktop-render"
-    },
-    "docs/images/panel-in-use.jpg": {
-      "sha256": "b19ce9e5a2fff165debb5c4565fbb03cec147cc8eb3529453af541829eeb5aeb",
-      "width": 900,
-      "height": 1200,
-      "kind": "authorized-maintainer-installation-photograph",
-      "authorization": "Andre explicitly requested his authentic supplied photo, not a synthetic or AI replacement, on 2026-11-12."
+      "kind": "synthetic-native-lvgl-desktop-render",
+      "exercise_artwork": {
+        "exercise": "barbell full squat",
+        "catalogue_id": "0043",
+        "source_sha256": "1b2fafc4eab453cf3b686f2bebc59e1eae6ee4f70e33e67e2bcdcc61eebffa51",
+        "processing": "Unchanged native adapter RGB565 still conversion and LVGL image binding",
+        "rights": "Separate third-party rights; see RENDER-NOTICE.md"
+      }
     }
   },
   "source_hashes": {
     "firmware/custom_components/gym_native/gym_native.cpp": "d5d22c246ec0348d3aff971fb873eaf5f1cfc731c136697127ef71d244b76a9b",
     "firmware/custom_components/gym_native/gym_native.h": "b09c109a3216f053e748ffdf8fc3cceccba28f6245dafe78b95b42f67a9dcba4",
     "firmware/custom_components/gym_native/workout_ui.cpp": "63fa068a35a52d5e3e1a865126df07c7ec19ba74bf92b0d283167430d2f902b9",
-    "tools/readme_fixture.cpp": "77fd2b5bd7571e8b2cf6bbea53f58e39f588af90c814dc7c26227e2a0dfc7624",
-    "tools/render_readme.py": "140b92757b3ce306d19fe4977c1da18e282c3348fda6bdd71767e5cd197091e4"
+    "tools/readme_fixture.cpp": "3adb70d249b4b4122fd1ee7f1e429cc4bc0e254597f4a55d3da71e34d7bae0a0",
+    "tools/render_readme.py": "ad578c3a8770cffc1c3a94675f72468f238ef0f248fd094d95bf3b91a58fe023",
+    "native/server.py": "bd90ddaed5bee5ce4a4fd0a840204e4142ff05e5e4ed0e8fba1e53338669ddd4"
   },
   "real_user_data_in_synthetic_renders": false,
-  "authorized_real_photo_included": true,
+  "authorized_real_photo_included": false,
   "hardware_framebuffer_capture": false,
   "network_access": false,
-  "restricted_exercise_media": false
+  "restricted_exercise_media_visible": true,
+  "standalone_restricted_media_included": false
 }

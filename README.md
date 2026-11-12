@@ -11,15 +11,23 @@ OpenGym product.
 
 ## Screenshots
 
-**Actual installed panel, photographed by the maintainer.** This is the real
-interface and exercise illustration as displayed, not an AI image or UI mockup.
-The maintainer explicitly provided and approved this photo for the README.
+**Native interface, rendered with example data.** These clean 1280×800 images
+use the panel's LVGL widget/render code and font, not a redesigned UI or AI artwork.
+They are desktop renders, not photographs or captured ESP32 framebuffers.
 
-<img src="docs/images/panel-in-use.jpg" alt="Actual wall-mounted OpenGym panel showing the maintainer's installed Romanian deadlift workout view" width="720">
+<img src="docs/images/workout.png" alt="Native OpenGym workout interface with synthetic Alex profile and the original barbell squat illustration" width="960">
 
-The photo shows an existing configured installation with optional exercise media.
-The visible exercise artwork has separate third-party rights; it is **not AGPL
-artwork or a reusable media pack**. See [photo and artwork notice](docs/images/PHOTO-NOTICE.md).
+<details>
+<summary>Profile selection</summary>
+
+<img src="docs/images/profiles.png" alt="Native profile selection with four fictional profiles" width="960">
+
+</details>
+
+The workout view demonstrates optional exercise media as displayed by a configured
+installation. The original exercise artwork has **separate third-party rights,
+not AGPL**. No standalone exercise asset is included. See the
+[render provenance and artwork notice](docs/images/RENDER-NOTICE.md).
 The generic installer still uses its neutral placeholder by default.
 
 ## What it does
@@ -33,8 +41,8 @@ The generic installer still uses its neutral placeholder by default.
 - Per-profile drafts and retained screen state during short network outages.
 - Local brightness, sleep schedule and password-protected browser administration.
 
-The default illustration is original geometric artwork. **Gym visual exercise
-images/animations are not included, downloaded or extracted from OpenGym.** See
+The default illustration is original geometric artwork. **No standalone Gym visual
+assets are bundled, downloaded or extracted by the installer.** See
 [media and licences](docs/MEDIA.md) before enabling your own illustrations.
 
 ## Supported setup

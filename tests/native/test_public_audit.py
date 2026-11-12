@@ -64,21 +64,11 @@ class DocumentationImageAuditTest(unittest.TestCase):
         manifest_path.write_text(json.dumps(manifest))
         return path
 
-    def test_only_exact_authorized_photo_without_metadata_passes(self):
-        content = (Path(__file__).parents[2] / "docs/images/panel-in-use.jpg").read_bytes()
-        path = self.approve_photo(content)
-        self.assertEqual(audit.audit([path]), [])
-        other = path.with_name("another-real-photo.jpg")
-        other.write_bytes(content)
-        self.assertTrue(audit.audit([other]))
-
-    def test_hash_approved_photo_with_exif_is_rejected(self):
+    def test_photos_rejected_even_with_legacy_manifest_approval(self):
         from PIL import Image
-        photo = Image.open(Path(__file__).parents[2] / "docs/images/panel-in-use.jpg")
-        exif = Image.Exif()
-        exif[315] = "SYNTHETIC-PRIVATE-METADATA"
+        photo = Image.new("RGB", (900, 1200), "white")
         output = io.BytesIO()
-        photo.save(output, format="JPEG", exif=exif)
+        photo.save(output, format="JPEG")
         path = self.approve_photo(output.getvalue())
         self.assertTrue(audit.audit([path]))
 
