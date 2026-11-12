@@ -16,8 +16,9 @@ import { musclesOf, MUSCLES } from '../vendor/opengym/frontend/src/lib/muscles.j
 import { mediaAsset } from '../bridge/catalogue-media.mjs';
 import { activeGym } from '../vendor/opengym/frontend/src/lib/gym-inventory.js';
 import { names } from '../preview/names.mjs';
+import { LANGUAGE, text } from '../bridge/language.mjs';
 
-export const VERSION = '1.2.0';
+export const VERSION = '1.2.1';
 export const OPENGYM_VERSION = '1.4.4';
 const clone = value => structuredClone(value);
 
@@ -42,7 +43,7 @@ const routineKey = (binding, routine) => crypto.createHash('sha256')
 
 function choicesFor(state, binding) {
   return state.routines.filter(r => typeof r.id === 'string' && Array.isArray(r.ex) && r.ex.length > 0 && r.ex.length <= 40)
-    .slice(0, 32).map(r => ({ key: routineKey(binding, r), name: clean(r.name || r.n || 'Treningsøkt', 160) }));
+    .slice(0, 32).map(r => ({ key: routineKey(binding, r), name: clean(r.name || r.n || text('Treningsøkt', 'Workout'), 160) }));
 }
 
 /** Preview an existing own routine without writing week/dayPlan or a workout. */
@@ -83,7 +84,7 @@ export function beginSession(raw, day, now = Date.now(), selection = {}) {
     active: {
       id: crypto.randomUUID(), d: localDate(new Date(now)), start: now,
       routineIds: built.routineIds,
-      name: deriveSessionName(built.routines.map(routine => routine.name)) || 'Treningsøkt',
+      name: deriveSessionName(built.routines.map(routine => routine.name)) || text('Treningsøkt', 'Workout'),
       bw: null, cur: 0, entries: clone(built.entries),
       ...(activeGym(state) ? { gym: { id: activeGym(state).id, name: activeGym(state).name } } : {}),
     },
@@ -229,13 +230,17 @@ function projectActive(session, binding) {
     const source = CATALOGUE.find(exercise => exercise.id === canonicalExId(binding.mediaAliases?.[entry.id] || (!custom ? entry.id : null)));
     const restSeconds = cfg.restSec == null ? 90 : num(cfg.restSec, 3600);
     const warmups = entry.sets.filter(isWarmupRow).length;
-    const detail = [mode === 'reps' && first.sides ? `V ${num(first.sides.L.r)} · H ${num(first.sides.R.r)} reps` : mode === 'reps' && cfg.side ? `${num(first.r) / 2} per side · ${num(first.r)} totalt` : null,
-      warmups ? `${warmups} oppvarmingssett` : null, `Pause ${restSeconds} sek`].filter(Boolean).join(' · ');
+    const detail = [mode === 'reps' && first.sides
+      ? `${text('V', 'L')} ${num(first.sides.L.r)} · ${text('H', 'R')} ${num(first.sides.R.r)} reps`
+      : mode === 'reps' && cfg.side ? `${num(first.r) / 2} per side · ${num(first.r)} ${text('totalt', 'total')}` : null,
+      warmups ? `${warmups} ${text('oppvarmingssett', warmups === 1 ? 'warm-up set' : 'warm-up sets')}` : null,
+      `${text('Pause', 'Rest')} ${restSeconds} ${text('sek', 'sec')}`].filter(Boolean).join(' · ');
     return {
-      name: clean(!custom && names[entry.id] ? names[entry.id] : known.n || known.name, 480),
-      target: mode === 'time' ? `${work.length} × ${num(first.sec)} sek`
+      name: clean(!custom && LANGUAGE === 'nb' && names[entry.id] ? names[entry.id] : known.n || known.name, 480),
+      target: mode === 'time' ? `${work.length} × ${num(first.sec)} ${text('sek', 'sec')}`
         : mode === 'cardio' ? `${num(first.min)} min` : `${work.length} × ${num(first.r)}`,
-      load: openWeight ? 'Valgfri vekt' : weight > 0 ? `${weight} ${session.unit}` : bodyweight ? 'Kroppsvekt' : 'Uten ekstra vekt',
+      load: openWeight ? text('Valgfri vekt', 'Choose weight') : weight > 0 ? `${weight} ${session.unit}`
+        : bodyweight ? text('Kroppsvekt', 'Bodyweight') : text('Uten ekstra vekt', 'No added weight'),
       detail, restSeconds, note: clean(entry.note || cfg.note || session.planNotes?.[entry.id], 1000),
       mode, unit: session.unit, bodyweight, perSide: !!cfg.side,
       ...cableControls(session, entry.id), muscles: MUSCLES.map(m => Math.min(1, musclesOf(known)[m] || 0)),

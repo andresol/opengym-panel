@@ -26,6 +26,8 @@ class ExerciseFlowTests(unittest.TestCase):
         production += method(ui, 'render_session(', 'session_action(')
         production += method(ui, 'session_action(', 'render_rest_day(')
         fixture = r'''
+#include "ui_text.h"
+esphome::gym_native::UiText ui_;
 #include "workout_progress.h"
 #include "set_feedback.h"
 #include "timer.h"

@@ -1,5 +1,13 @@
 # Changelog
 
+
+## 1.1.33-community.1 — English language support
+
+- English (`en`) touchscreen, dialogs, muscle labels and local settings page.
+- English generated workout captions and built-in catalogue names in the companion.
+- Norwegian (`nb`) remains the default; user-authored names, notes and workout values are unchanged.
+- Language selection during installation, with matching firmware/backend settings and isolated tests.
+
 ## 1.1.32-community.1 — initial community source preview
 
 - Extracted the existing touchscreen/session workflow into a standalone source

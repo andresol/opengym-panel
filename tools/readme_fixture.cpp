@@ -2,6 +2,7 @@
 // from production source by render_readme.py. No network or device libraries.
 #include "lvgl.h"
 #include "ui_style.h"
+#include "ui_text.h"
 #include "person_handoff.h"
 #include "workout_progress.h"
 #include "set_feedback.h"
@@ -38,6 +39,7 @@ class GymNative {
   const lv_font_t *small_, *normal_, *heading_, *large_, *exercise_font_;
   bool bound_ = false, valid_ = true, command_busy_ = false, paired_ = true;
   bool session_button_primary_ = true;
+  UiText ui_;
   int selected_ = 0, day_ = 0, person_ = 0, image_display_width_ = 512;
   unsigned session_done_ = 1, session_total_ = 24;
   double session_elapsed_ = 432;
@@ -102,6 +104,7 @@ int main(int argc, char **argv) {
   lv_obj_remove_style_all(root);
   lv_obj_set_style_bg_opa(root, LV_OPA_COVER, 0);
   GymNative gym;
+  gym.ui_.english = /* ENGLISH */;
   gym.begin(&f16, &f20, &f30, &f42, &f18);
   set_text(gym.status_label_, "");
   hidden(gym.status_label_, true);
@@ -112,21 +115,25 @@ int main(int argc, char **argv) {
   hidden(gym.workout_, false);
   hidden(gym.person_button_, false);
   set_text(gym.person_text_, "Alex");
-  const char *names[] = {"Stangknebøy", "Manualbenk", "Sittende kabelroing",
-                         "Nedtrekk", "Sidehev med manualer", "Dead bug"};
+  gym.title_ = gym.ui_.tr("Helkropp A", "Full body A");
+  const char *names[] = {gym.ui_.tr("Stangknebøy", "Barbell squat"),
+      gym.ui_.tr("Manualbenk", "Dumbbell bench press"),
+      gym.ui_.tr("Sittende kabelroing", "Seated cable row"),
+      gym.ui_.tr("Nedtrekk", "Lat pulldown"),
+      gym.ui_.tr("Sidehev med manualer", "Dumbbell lateral raise"), "Dead bug"};
   for (auto name : names) {
     Exercise exercise;
     exercise.name = name;
     exercise.target = "3 × 8";
     exercise.load = "50 kg";
-    exercise.detail = "1 oppvarmingssett · Pause 90 sek";
-    exercise.note = "Eksempeldata · kontrollert teknikk og rolig tempo.";
+    exercise.detail = gym.ui_.tr("1 oppvarmingssett · Pause 90 sek", "1 warm-up set · Rest 90 sec");
+    exercise.note = gym.ui_.tr("Eksempeldata · kontrollert teknikk og rolig tempo.", "Example data · controlled technique and a steady pace.");
     exercise.mode = "reps";
     exercise.unit = "kg";
     exercise.rest = 90;
     exercise.work_sets = 3;
     for (int row = 0; row < 4; ++row) {
-      exercise.rows.push_back({row ? "Sett " + std::to_string(row) : "Oppv. 1",
+      exercise.rows.push_back({row ? std::string(gym.ui_.tr("Sett ", "Set ")) + std::to_string(row) : gym.ui_.tr("Oppv. 1", "Warm-up 1"),
                               row ? "50 kg" : "20 kg", "8 reps"});
       Exercise::Set set;
       set.warmup = row == 0;

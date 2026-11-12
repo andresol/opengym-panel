@@ -22,16 +22,18 @@
     }
   },
   "source_hashes": {
-    "firmware/custom_components/gym_native/gym_native.cpp": "d5d22c246ec0348d3aff971fb873eaf5f1cfc731c136697127ef71d244b76a9b",
-    "firmware/custom_components/gym_native/gym_native.h": "b09c109a3216f053e748ffdf8fc3cceccba28f6245dafe78b95b42f67a9dcba4",
-    "firmware/custom_components/gym_native/workout_ui.cpp": "63fa068a35a52d5e3e1a865126df07c7ec19ba74bf92b0d283167430d2f902b9",
-    "tools/readme_fixture.cpp": "3adb70d249b4b4122fd1ee7f1e429cc4bc0e254597f4a55d3da71e34d7bae0a0",
-    "tools/render_readme.py": "ad578c3a8770cffc1c3a94675f72468f238ef0f248fd094d95bf3b91a58fe023",
-    "native/server.py": "bd90ddaed5bee5ce4a4fd0a840204e4142ff05e5e4ed0e8fba1e53338669ddd4"
+    "firmware/custom_components/gym_native/gym_native.cpp": "18a9dc40c8a65a18b627a58c3775311d5c92402e9f551d5347169b6663154b43",
+    "firmware/custom_components/gym_native/gym_native.h": "96ccc7c1a31bdfccd96a775285be4c8e99a9feaf6c40a27853d5d6f1dcd399d5",
+    "firmware/custom_components/gym_native/workout_ui.cpp": "28fc05a20ccd872583c2421ff1a0de88f2cb568ee73dd05b77e69946c4726cc7",
+    "tools/readme_fixture.cpp": "3e433fb054a5bfc63946fd16c25918dee352059ac415181cad0d8c2bc926a57e",
+    "tools/render_readme.py": "4b2855431a9ac1c69c3e3df220c85ce1986258aec6ad4db2d8e7c5eca72509d4",
+    "native/server.py": "bd90ddaed5bee5ce4a4fd0a840204e4142ff05e5e4ed0e8fba1e53338669ddd4",
+    "firmware/custom_components/gym_native/ui_text.h": "6d6545dbaf3d0f5c8709c34699227ce75efd842a6acfe53b46245a0a03e3ab90"
   },
   "real_user_data_in_synthetic_renders": false,
   "authorized_real_photo_included": false,
   "hardware_framebuffer_capture": false,
+  "language": "nb",
   "network_access": false,
   "restricted_exercise_media_visible": true,
   "standalone_restricted_media_included": false

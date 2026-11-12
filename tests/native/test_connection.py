@@ -26,6 +26,8 @@ class ConnectionTests(unittest.TestCase):
     def test_snapshot_editor_timer_freshness_and_hard_invalidation(self):
         production = (COMPONENT / 'connection.cpp').read_text().replace('#include "gym_native.h"', '')
         fixture = r'''
+#include "ui_text.h"
+esphome::gym_native::UiText ui_;
 #include "timer.h"
 #include <atomic>
 #include <cassert>
@@ -149,6 +151,8 @@ int main() {
         production = 'void GymNative::worker()' + source.split(
             'void GymNative::worker()', 1)[1].split('bool GymNative::unpack_media(', 1)[0]
         fixture = r'''
+#include "ui_text.h"
+esphome::gym_native::UiText ui_;
 #include <atomic>
 #include <cassert>
 #include <cstdint>
@@ -244,6 +248,8 @@ int main() {
         production = 'void GymNative::submit(' + ui.split('void GymNative::submit(', 1)[1]
         production = production.rsplit('}  // namespace esphome::gym_native', 1)[0]
         fixture = r'''
+#include "ui_text.h"
+esphome::gym_native::UiText ui_;
 #include "set_feedback.h"
 #include <cassert>
 #include <cstdint>

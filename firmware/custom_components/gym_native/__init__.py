@@ -15,8 +15,7 @@ CONFIG_SCHEMA = cv.Schema({
     cv.Required('token'): cv.string_strict,
     cv.Required('write_token'): cv.string_strict,
     cv.Optional('timezone', default='Europe/Oslo'): cv.string_strict,
-    # Only the existing Norwegian UI is supported in this configuration-only step.
-    cv.Optional('language', default='nb'): cv.one_of('nb'),
+    cv.Optional('language', default='nb'): cv.one_of('nb', 'en'),
     cv.Required('backlight'): cv.use_id(light.LightState),
     cv.Required('clock'): cv.use_id(time.RealTimeClock),
     cv.Required('display_lvgl'): cv.use_id(lvgl.LvglComponent),
@@ -36,6 +35,7 @@ async def to_code(config):
     cg.add(var.set_token(config['token']))
     cg.add(var.set_write_token(config['write_token']))
     cg.add(var.set_timezone(config['timezone']))
+    cg.add(var.set_language(config['language']))
 
     for key in ['backlight', 'clock', 'display_lvgl']:
         target = await cg.get_variable(config[key])

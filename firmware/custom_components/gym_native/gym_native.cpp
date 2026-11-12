@@ -326,21 +326,21 @@ void GymNative::begin(const lv_font_t *small, const lv_font_t *normal,
   date_label_ = label(root_, "", 24, 64, 148, 24, small_, MUTED);
   lv_obj_set_width(date_label_, lv_obj_get_width(brand_label_));
   lv_obj_set_style_text_align(date_label_, LV_TEXT_ALIGN_CENTER, 0);
-  auto *person_button = button(root_, "Velg person", 956, 24, 300, 64, 2);
+  auto *person_button = button(root_, ui_.tr("Velg person", "Choose profile"), 956, 24, 300, 64, 2);
   person_button_ = person_button;
   lv_obj_set_style_border_width(person_button, 2, 0);
   lv_obj_set_style_border_color(person_button, lv_color_hex(ACCENT), 0);
   person_text_ = lv_obj_get_child(person_button, 0);
   session_label_ = label(root_, "", 24, 68, 292, 24, small_, MUTED);
-  volume_title_ = label(root_, "VOLUM", 188, 14, 136, 24, small_, MUTED);
+  volume_title_ = label(root_, ui_.tr("VOLUM", "VOLUME"), 188, 14, 136, 24, small_, MUTED);
   volume_label_ = label(root_, "", 188, 40, 136, 24, normal_, ACCENT);
   hidden(volume_title_, true); hidden(volume_label_, true);
   welcome_ = box(root_, 0, 96, 1280, 680, BG);
-  welcome_status_ = label(welcome_, handoff_caption(Handoff::NONE), 100, 52, 1080, 44, heading_, ACCENT);
-  welcome_heading_ = label(welcome_, "Hvem skal trene?", 100, 112, 1080, 70, large_);
+  welcome_status_ = label(welcome_, handoff_caption(Handoff::NONE, ui_), 100, 52, 1080, 44, heading_, ACCENT);
+  welcome_heading_ = label(welcome_, ui_.tr("Hvem skal trene?", "Who is training?"), 100, 112, 1080, 70, large_);
   people_list_ = box(welcome_, 100, 240, 1080, 344, BG, true);
   hidden(person_button_, true);
-  label(people_list_, "Henter personer …", 0, 0, 1000, 50, heading_, MUTED);
+  label(people_list_, ui_.tr("Henter personer …", "Loading profiles …"), 0, 0, 1000, 50, heading_, MUTED);
 
   workout_ = box(root_, 0, 96, 1280, 680, BG);
   routine_label_ = label(workout_, "", 24, 12, 664, 48, normal_);
@@ -349,17 +349,17 @@ void GymNative::begin(const lv_font_t *small, const lv_font_t *normal,
   lv_obj_remove_flag(muscle_image_, LV_OBJ_FLAG_CLICKABLE);
   hidden(muscle_button_, true);
   for (int n = 0; n < 7; ++n) {
-    const char *names[] = {"Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"};
+    const char *names[] = {ui_.tr("Man", "Mon"), ui_.tr("Tir", "Tue"), ui_.tr("Ons", "Wed"), ui_.tr("Tor", "Thu"), ui_.tr("Fre", "Fri"), ui_.tr("Lør", "Sat"), ui_.tr("Søn", "Sun")};
     days_[n] = button(workout_, names[n], 856 + n * 58, 0, 52, 48, 3, n);
     lv_obj_set_style_text_font(lv_obj_get_child(days_[n], 0), small_, 0);
   }
-  label(workout_, "Øvelser", 24, 64, 244, 24, normal_, MUTED);
+  label(workout_, ui_.tr("Øvelser", "Exercises"), 24, 64, 244, 24, normal_, MUTED);
   exercise_list_ = box(workout_, 24, 100, 260, 580, BG, true);
   lv_obj_add_event_cb(exercise_list_, exercise_scroll, LV_EVENT_SCROLL, this);
   exercise_more_ = label(workout_, "↓", 24, 652, 260, 24, normal_, MUTED);
   lv_obj_set_style_text_align(exercise_more_, LV_TEXT_ALIGN_CENTER, 0);
   hidden(exercise_more_, true);
-  routine_button_ = button(workout_, "Bytt økt", 24, 616, 260, 64, 22);
+  routine_button_ = button(workout_, ui_.tr("Bytt økt", "Change workout"), 24, 616, 260, 64, 22);
   hidden(routine_button_, true);
   // Inset passive text from both sides of the image column, away from controls.
   position_label_ = label(workout_, "", 316, 64, 592, 24, small_, ACCENT);
@@ -367,7 +367,7 @@ void GymNative::begin(const lv_font_t *small, const lv_font_t *normal,
   media_stage_ = box(workout_, 292, 176, 640, 360, BG);
   lv_obj_set_style_radius(media_stage_, 16, 0);
   lv_obj_add_flag(media_stage_, LV_OBJ_FLAG_OVERFLOW_VISIBLE);
-  media_empty_ = label(media_stage_, "Henter illustrasjon …", 24, 148, 592, 80, normal_, MUTED);
+  media_empty_ = label(media_stage_, ui_.tr("Henter illustrasjon …", "Loading illustration …"), 24, 148, 592, 80, normal_, MUTED);
   lv_obj_set_style_text_align(media_empty_, LV_TEXT_ALIGN_CENTER, 0);
   // Match the still-image canvas exactly in BOTH modes. The animation keeps
   // its small source buffer, scaled/cropped inside this fixed pixel envelope.
@@ -394,10 +394,10 @@ void GymNative::begin(const lv_font_t *small, const lv_font_t *normal,
   note_scroller_ = box(workout_, 316, 548, 592, 40, BG, true);
   note_label_ = label(note_scroller_, "", 0, 0, 592, 40, small_, MUTED);
   lv_obj_set_height(note_label_, LV_SIZE_CONTENT);
-  controls_[0] = button(workout_, "‹ Forrige", 336, 616, 264, 64, 5, -1);
-  controls_[1] = button(workout_, "Neste ›", 624, 616, 264, 64, 5, 1);
+  controls_[0] = button(workout_, ui_.tr("‹ Forrige", "‹ Previous"), 336, 616, 264, 64, 5, -1);
+  controls_[1] = button(workout_, ui_.tr("Neste ›", "Next ›"), 624, 616, 264, 64, 5, 1);
 
-  label(workout_, "ARBEIDSSETT", 956, 64, 212, 24, small_, MUTED);
+  label(workout_, ui_.tr("ARBEIDSSETT", "WORK SETS"), 956, 64, 212, 24, small_, MUTED);
   set_count_ = label(workout_, "—", 1188, 56, 68, 52, large_, ACCENT);
   target_label_ = label(workout_, "", 956, 112, 300, 40, heading_);
   load_label_ = label(workout_, "", 956, 156, 300, 42, heading_);
@@ -405,24 +405,24 @@ void GymNative::begin(const lv_font_t *small, const lv_font_t *normal,
   rows_ = box(workout_, 956, 268, 300, 194, BG, true);
   timer_label_ = label(workout_, "00:00", 956, 472, 204, 54, large_);
   lv_obj_set_style_text_align(timer_label_, LV_TEXT_ALIGN_LEFT, 0);
-  auto *pause_caption = label(workout_, "PAUSE", 1172, 484, 84, 30, small_, MUTED);
+  auto *pause_caption = label(workout_, ui_.tr("PAUSE", "REST"), 1172, 484, 84, 30, small_, MUTED);
   lv_obj_set_style_text_align(pause_caption, LV_TEXT_ALIGN_RIGHT, 0);
   controls_[2] = button(workout_, "−15 s", 956, 540, 92, 48, 7, -15);
   controls_[3] = button(workout_, "+15 s", 1164, 540, 92, 48, 7, 15);
-  controls_[4] = button(workout_, "Nullstill", 1056, 540, 100, 48, 8);
-  timer_button_ = button(workout_, "Start pause", 956, 616, 300, 64, 9, 0, false);
+  controls_[4] = button(workout_, ui_.tr("Nullstill", "Reset"), 1056, 540, 100, 48, 8);
+  timer_button_ = button(workout_, ui_.tr("Start pause", "Start rest"), 956, 616, 300, 64, 9, 0, false);
   controls_[5] = timer_button_;
   timer_text_ = lv_obj_get_child(timer_button_, 0);
-  session_button_ = button(root_, "Start økt", 336, 24, 552, 64, 10, 0, true);
+  session_button_ = button(root_, ui_.tr("Start økt", "Start workout"), 336, 24, 552, 64, 10, 0, true);
   session_text_ = lv_obj_get_child(session_button_, 0);
   hidden(session_button_, true);
   // Errors temporarily replace the left header labels, never content/navigation.
-  status_label_ = label(root_, "Kobler til OpenGym …", 24, 24, 244, 64, small_, MUTED);
-  set_button_ = button(root_, "Registrer sett", 624, 24, 264, 64, 11, 0, true);
+  status_label_ = label(root_, ui_.tr("Kobler til OpenGym …", "Connecting to OpenGym …"), 24, 24, 244, 64, small_, MUTED);
+  set_button_ = button(root_, ui_.tr("Registrer sett", "Log set"), 624, 24, 264, 64, 11, 0, true);
   hidden(set_button_, true);
   rest_page_ = box(workout_, 0, 56, 1280, 624, BG);
-  rest_heading_ = label(rest_page_, "Dine økter", 88, 24, 1104, 64, large_);
-  rest_empty_ = label(rest_page_, "Ingen egne økter", 88, 110, 1104, 48, heading_, MUTED);
+  rest_heading_ = label(rest_page_, ui_.tr("Dine økter", "Your workouts"), 88, 24, 1104, 64, large_);
+  rest_empty_ = label(rest_page_, ui_.tr("Ingen egne økter", "No workouts available"), 88, 110, 1104, 48, heading_, MUTED);
   rest_list_ = box(rest_page_, 88, 148, 1104, 446, BG, true);
   hidden(rest_page_, true);
   // Static controls occupy slots 0..16. Picker and exercise lists use independent ranges.
@@ -580,15 +580,15 @@ bool GymNative::accept_plan(const std::string &body) {
         if (stored.per_side) { stored.left = read(set["sides"]["L"]); stored.right = read(set["sides"]["R"]); }
         e.sets.push_back(stored);
         std::string target, load;
-        if (e.mode == "time") target = number(set["seconds"]) + " s";
-        else if (e.mode == "cardio") target = number(set["minutes"]) + " min";
+        if (e.mode == "time") target = ui_.decimal(number(set["seconds"])) + " s";
+        else if (e.mode == "cardio") target = ui_.decimal(number(set["minutes"])) + " min";
         else {
-          target = number(set["reps"]) + " reps";
-          if (set["weight"].isNull()) load = "Valgfri vekt";
-          else if (row["bodyweight"].as<bool>() && set["weight"].as<float>() == 0) load = "Kroppsvekt";
-          else load = number(set["weight"]) + " " + e.unit;
+          target = ui_.decimal(number(set["reps"])) + " reps";
+          if (set["weight"].isNull()) load = ui_.tr("Valgfri vekt", "Choose weight");
+          else if (row["bodyweight"].as<bool>() && set["weight"].as<float>() == 0) load = ui_.tr("Kroppsvekt", "Bodyweight");
+          else load = ui_.decimal(number(set["weight"])) + " " + e.unit;
         }
-        const auto caption = stored.warmup ? "Oppv. " + std::to_string(++warmup) : "Sett " + std::to_string(++work);
+        const auto caption = stored.warmup ? ui_.tr("Oppv. ", "Warm-up ") + std::to_string(++warmup) : ui_.tr("Sett ", "Set ") + std::to_string(++work);
         e.rows.push_back({caption, load, target});
       }
       e.work_sets = work;
@@ -634,7 +634,7 @@ bool GymNative::accept_plan(const std::string &body) {
     const auto next_image = exercises_.empty() ? std::string() : playing_ ? exercises_[selected_].animation : exercises_[selected_].image;
     if (!same_session || next_image != previous_image) request_media();
   }
-  if (!command_busy_ && !modal_kind_) update_status(saved ? "Økten er lagret i OpenGym" : "");
+  if (!command_busy_ && !modal_kind_) update_status(saved ? ui_.tr("Økten er lagret i OpenGym", "Workout saved to OpenGym") : "");
   render_session();
   apply_set_feedback();
   return true;
@@ -675,9 +675,9 @@ void GymNative::clear_plan(const char *status) {
   timer_.reset(0);
   lock_request(); wanted_media_.clear(); wanted_prefetch_.clear(); prefetch_ready_ = false; ++media_generation_; unlock_request();
   hide_media();
-  set_text(media_empty_, "Økten er utilgjengelig");
+  set_text(media_empty_, ui_.tr("Økten er utilgjengelig", "Workout unavailable"));
   render_plan();
-  update_status(status, strncmp(status, "Frakoblet", 9) == 0);
+  update_status(status, strncmp(status, ui_.tr("Frakoblet", "Disconnected"), ui_.english ? 12 : 9) == 0);
 }
 
 void GymNative::picker(Handoff completion) {
@@ -690,9 +690,9 @@ void GymNative::picker(Handoff completion) {
   person_ = -1;
   lock_request(); wanted_slug_.clear(); wanted_day_ = -1; wanted_routine_.clear(); ++context_; unlock_request();
   clear_plan("");
-  set_text(person_text_, "Velg person");
-  set_text(welcome_status_, handoff_caption(completion));
-  set_text(welcome_heading_, completion == Handoff::NONE ? "Hvem skal trene?" : "Hvem skal trene nå?");
+  set_text(person_text_, ui_.tr("Velg person", "Choose profile"));
+  set_text(welcome_status_, handoff_caption(completion, ui_));
+  set_text(welcome_heading_, completion == Handoff::NONE ? ui_.tr("Hvem skal trene?", "Who is training?") : ui_.tr("Hvem skal trene nå?", "Who is training next?"));
   lv_obj_scroll_to_y(people_list_, 0, LV_ANIM_OFF);
   hidden(person_button_, true);
   hidden(workout_, true); hidden(welcome_, false);
@@ -706,7 +706,7 @@ void GymNative::choose_person(int index) {
   pending_handoff_ = Handoff::NONE; command_action_.clear();
   hidden(person_button_, false);
   lock_request(); wanted_slug_ = people_[index].slug; wanted_day_ = -1; wanted_routine_.clear(); ++context_; unlock_request();
-  clear_plan("Henter økt …");
+  clear_plan(ui_.tr("Henter økt …", "Loading workout …"));
   set_text(person_text_, people_[index].name);
   hidden(welcome_, true); hidden(workout_, false);
 }
@@ -714,7 +714,7 @@ void GymNative::choose_person(int index) {
 void GymNative::choose_day(int day) {
   if (command_busy_ || !session_id_.empty() || person_ < 0 || day < 0 || day > 6) return;
   lock_request(); wanted_day_ = day; wanted_routine_.clear(); ++context_; unlock_request();
-  clear_plan("Henter økt …");
+  clear_plan(ui_.tr("Henter økt …", "Loading workout …"));
 }
 
 void GymNative::choose_exercise(int index) {
@@ -744,8 +744,8 @@ void GymNative::request_media() {
   lock_request(); wanted_media_ = route;
   wanted_prefetch_ = valid_ && !exercises_.empty() ? (playing_ ? exercises_[selected_].image : exercises_[selected_].animation) : "";
   prefetch_ready_ = false; ++media_generation_; unlock_request();
-  set_text(media_empty_, exercises_.empty() ? "Ingen planlagt styrkeøkt" :
-           route.empty() ? "Ingen illustrasjon for denne øvelsen" : "Henter illustrasjon …");
+  set_text(media_empty_, exercises_.empty() ? ui_.tr("Ingen planlagt styrkeøkt", "No strength workout planned") :
+           route.empty() ? ui_.tr("Ingen illustrasjon for denne øvelsen", "No illustration for this exercise") : ui_.tr("Henter illustrasjon …", "Loading illustration …"));
 }
 
 bool GymNative::accept_media(SharedMedia body, const std::string &route) {
@@ -821,7 +821,7 @@ void GymNative::render_timer() {
   snprintf(buffer, sizeof(buffer), "%02u:%02u", unsigned(remaining / 60), unsigned(remaining % 60));
   set_text(timer_label_, buffer);
   lv_obj_set_style_text_color(timer_label_, lv_color_hex(timer_.running && remaining ? ACCENT : TEXT), 0);
-  set_text(timer_text_, timer_.running ? "Stopp pause" : remaining ? "Start pause" : "Start på nytt");
+  set_text(timer_text_, timer_.running ? ui_.tr("Stopp pause", "Stop rest") : remaining ? ui_.tr("Start pause", "Start rest") : ui_.tr("Start på nytt", "Restart"));
 }
 
 void GymNative::render_plan() {
@@ -830,7 +830,7 @@ void GymNative::render_plan() {
       ? date_.substr(8, 2) + "." + date_.substr(5, 2) + "." + date_.substr(0, 4)
       : "";
   set_text(date_label_, display_date);
-  set_text(routine_label_, valid_ ? title_ : "OpenGym utilgjengelig");
+  set_text(routine_label_, valid_ ? title_ : ui_.tr("OpenGym utilgjengelig", "OpenGym unavailable"));
   const bool can_change = valid_ && !selected_routine_.empty() && session_id_.empty();
   hidden(routine_button_, !can_change);
   const int available_height = can_change ? 500 : 580;
@@ -886,11 +886,11 @@ void GymNative::update_exercise_overflow() {
 
 void GymNative::render_exercise() {
   const Exercise *e = valid_ && !exercises_.empty() ? &exercises_[selected_] : nullptr;
-  set_text(position_label_, e ? "ØVELSE " + std::to_string(selected_ + 1) + " AV " + std::to_string(exercises_.size()) : "");
-  set_text(exercise_label_, e ? e->name : valid_ ? "Tid til å hente seg inn" : "Ingen ferske treningsdata");
+  set_text(position_label_, e ? ui_.tr("ØVELSE ", "EXERCISE ") + std::to_string(selected_ + 1) + ui_.tr(" AV ", " OF ") + std::to_string(exercises_.size()) : "");
+  set_text(exercise_label_, e ? e->name : valid_ ? ui_.tr("Tid til å hente seg inn", "Time to recover") : ui_.tr("Ingen ferske treningsdata", "No current workout data"));
   set_text(set_count_, e ? std::to_string(e->work_sets) : "—");
-  const auto target = e ? decimal_text(e->target) : "";
-  const auto load = e ? decimal_text(e->load) : "";
+  const auto target = e ? ui_.decimal(e->target) : "";
+  const auto load = e ? ui_.decimal(e->load) : "";
   const auto summary = target + (target.empty() || load.empty() ? "" : " · ") + load;
   lv_point_t summary_size{};
   lv_text_get_size(&summary_size, summary.c_str(), heading_, 0, 0, 300, LV_TEXT_FLAG_EXPAND);
@@ -903,7 +903,7 @@ void GymNative::render_exercise() {
   lv_obj_set_y(detail_label_, compact ? 164 : 208);
   lv_obj_set_y(rows_, compact ? 222 : 268);
   lv_obj_set_height(rows_, compact ? 240 : 194);
-  set_text(detail_label_, e ? decimal_text(e->detail) : "");
+  set_text(detail_label_, e ? ui_.decimal(e->detail) : "");
   set_text(note_label_, e ? e->note : "");
   lv_obj_scroll_to_y(note_scroller_, 0, LV_ANIM_OFF);
   const int previous_scroll = lv_obj_get_scroll_y(rows_);
@@ -929,7 +929,7 @@ void GymNative::render_exercise() {
       lv_obj_set_y(cell, y + (row_height - height) / 2);
     }
     if (done || is_next) {
-      auto *done_cell = label(parent, is_next ? "NESTE" : "✓", 10, y, 90, 24,
+      auto *done_cell = label(parent, is_next ? ui_.tr("NESTE", "NEXT") : "✓", 10, y, 90, 24,
                               is_next ? small_ : normal_, is_next ? PRIMARY_TEXT : ACCENT);
       lv_obj_set_style_text_align(done_cell, LV_TEXT_ALIGN_LEFT, 0);
       lv_obj_set_height(done_cell, LV_SIZE_CONTENT);
@@ -956,15 +956,15 @@ void GymNative::render_exercise() {
         const auto &value = side == 1 ? row.left : side == 2 ? row.right : row.value;
         char load[48] = {}, target[48] = {};
         if (e->mode == "reps") {
-          snprintf(load, sizeof(load), "%s", weight_caption(value.weight, e->unit).c_str());
+          snprintf(load, sizeof(load), "%s", ui_.decimal(weight_caption(value.weight, e->unit)).c_str());
           snprintf(target, sizeof(target), "%.0f reps", value.reps);
-        } else snprintf(target, sizeof(target), "%s", weight_caption(
-            e->mode == "time" ? value.seconds : value.minutes, e->mode == "time" ? "s" : "min").c_str());
+        } else snprintf(target, sizeof(target), "%s", ui_.decimal(weight_caption(
+            e->mode == "time" ? value.seconds : value.minutes, e->mode == "time" ? "s" : "min")).c_str());
         divide_before(true);
         const bool is_next = progress.next_row == static_cast<int>(i) && progress.next_side == side;
         auto *b = button(rows_, "", 0, row_y, 292, 54, 12, i * 3 + side, is_next);
         hidden(lv_obj_get_child(b, 0), true);
-        columns(b, 0, e->rows[i].name + (side == 1 ? " V" : side == 2 ? " H" : ""), load, target,
+        columns(b, 0, e->rows[i].name + (side == 1 ? ui_.tr(" V", " L") : side == 2 ? ui_.tr(" H", " R") : ""), load, target,
                 true, value.done, is_next);
         lv_obj_set_style_bg_color(b, lv_color_hex(is_next ? ACCENT : value.done ? SELECTED : SURFACE), 0);
         row_y += 62;
@@ -1020,28 +1020,28 @@ void GymNative::loop() {
       if (kind == 1) {
         const bool accepted = ok && accept_people(body);
         plan_retry_ = !accepted;
-        if (!accepted) update_status("Personer utilgjengelige · prøver igjen", true);
+        if (!accepted) update_status(ui_.tr("Personer utilgjengelige · prøver igjen", "Profiles unavailable · retrying"), true);
       } else if (kind == 2) {
         receive_plan(ok, status, body);
       } else if (kind == 4) {
         command_busy_ = false;
         if (ok && status == 200 && accept_plan(body)) {
           close_modal();
-          update_status(command_action_ == "pair" ? "Tilkoblet OpenGym" : session_id_.empty() ? result_state_ == "saved" ? "Økten er lagret i OpenGym" : "Økten er avsluttet" : "");
+          update_status(command_action_ == "pair" ? ui_.tr("Tilkoblet OpenGym", "Connected to OpenGym") : session_id_.empty() ? result_state_ == "saved" ? ui_.tr("Økten er lagret i OpenGym", "Workout saved to OpenGym") : ui_.tr("Økten er avsluttet", "Workout finished") : "");
         } else {
           if (!ok || status == 200 || status >= 500) connection_failed();
           if (status > 0 && status != 200) set_feedback_.cancel();
           std::string error;
           if (ok) json::parse_json(body, [&](JsonObject root) { error = text(root["error"], 60); return true; });
-          const char *message = "Bekreftelse mangler · henter økten på nytt";
-          if (error == "pair_required") { paired_ = false; message = "Koble til OpenGym for å fortsette"; }
-          else if (error == "wrong_profile") message = "Koden tilhører en annen person";
-          else if (error == "invalid_pair_code") message = "Ugyldig eller utløpt kode";
-          else if (error == "session_changed") message = "Økten er oppdatert · prøv igjen";
-          else if (error == "unsupported_workout") message = "Denne økten må registreres i OpenGym-appen";
-          else if (error == "enter_result") message = "Registrer faktisk antall eller varighet";
-          else if (error == "invalid_value") message = "Kontroller settverdiene";
-          else if (error == "routine_unavailable" || error == "not_rest_day") message = "Økten er endret · velg på nytt";
+          const char *message = ui_.tr("Bekreftelse mangler · henter økten på nytt", "Not confirmed · refreshing workout");
+          if (error == "pair_required") { paired_ = false; message = ui_.tr("Koble til OpenGym for å fortsette", "Pair with OpenGym to continue"); }
+          else if (error == "wrong_profile") message = ui_.tr("Koden tilhører en annen person", "This code belongs to another profile");
+          else if (error == "invalid_pair_code") message = ui_.tr("Ugyldig eller utløpt kode", "Invalid or expired code");
+          else if (error == "session_changed") message = ui_.tr("Økten er oppdatert · prøv igjen", "Workout updated · try again");
+          else if (error == "unsupported_workout") message = ui_.tr("Denne økten må registreres i OpenGym-appen", "Log this workout in the OpenGym app");
+          else if (error == "enter_result") message = ui_.tr("Registrer faktisk antall eller varighet", "Enter the actual reps or duration");
+          else if (error == "invalid_value") message = ui_.tr("Kontroller settverdiene", "Check the set values");
+          else if (error == "routine_unavailable" || error == "not_rest_day") message = ui_.tr("Økten er endret · velg på nytt", "Workout changed · choose again");
           update_status(message, true);
           if (modal_message_) set_text(modal_message_, message);
           if (error == "pair_required") show_pair();
@@ -1067,7 +1067,7 @@ void GymNative::loop() {
     if (!accept_media(std::move(binary), route)) {
       media_loading_ = false;
       if (playing_) { playing_ = false; request_media(); }
-      else if (!media_bytes_) set_text(media_empty_, "Illustrasjonen er utilgjengelig");
+      else if (!media_bytes_) set_text(media_empty_, ui_.tr("Illustrasjonen er utilgjengelig", "Illustration unavailable"));
     }
   }
   media_paused_ = display_asleep_;

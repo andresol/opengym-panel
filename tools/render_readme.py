@@ -71,6 +71,8 @@ def main():
         parser.add_argument("--" + name, required=True, type=Path)
     parser.add_argument("--exercise-image", type=Path,
                         help="Optional lawfully supplied squat still; never downloaded or copied to public source")
+    parser.add_argument("--language", choices=['nb', 'en'], default='nb')
+    parser.add_argument("--output-dir", type=Path, default=ROOT / "docs/images")
     args = parser.parse_args()
     cpp = (COMPONENT / "gym_native.cpp").read_text()
     ui = (COMPONENT / "workout_ui.cpp").read_text()
@@ -86,8 +88,9 @@ def main():
     for marker, value in [("FONT_DATA", font_data), ("FONT_INIT", font_init),
                           ("STRUCTURES", structures), ("METHODS", methods), ("PEOPLE", people)]:
         source = source.replace("/* " + marker + " */", value)
+    source = source.replace("/* ENGLISH */", "true" if args.language == 'en' else "false")
     from PIL import Image
-    output = ROOT / "docs/images"
+    output = args.output_dir
     output.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="opengym-readme-") as folder:
         temporary = Path(folder)
@@ -120,7 +123,7 @@ def main():
                                     (temporary / name).read_bytes(), "raw", "BGR", int(stride), 1)
             path = output / (Path(name).stem + ".png")
             image.save(path, optimize=True)
-            images[path.relative_to(ROOT).as_posix()] = {
+            images["docs/images/" + path.name] = {
                 "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
                 "width": image.width, "height": image.height,
                 "kind": "synthetic-native-lvgl-desktop-render",
@@ -131,12 +134,12 @@ def main():
         provenance = {path.relative_to(ROOT).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
                       for path in [COMPONENT / "gym_native.cpp", COMPONENT / "gym_native.h",
                                    COMPONENT / "workout_ui.cpp", ROOT / "tools/readme_fixture.cpp",
-                                   ROOT / "tools/render_readme.py", ROOT / "native/server.py"]}
+                                   ROOT / "tools/render_readme.py", ROOT / "native/server.py", COMPONENT / "ui_text.h"]}
         (output / "manifest.json").write_text(json.dumps({"schema": 1, "images": images,
             "source_hashes": provenance, "real_user_data_in_synthetic_renders": False,
             "authorized_real_photo_included": False,
             "hardware_framebuffer_capture": False,
-            "network_access": False, "restricted_exercise_media_visible": bool(artwork),
+            "language": args.language, "network_access": False, "restricted_exercise_media_visible": bool(artwork),
             "standalone_restricted_media_included": False}, indent=2) + "\n")
         print("Rendered two offline native-LVGL views with example data; review before publishing.")
 

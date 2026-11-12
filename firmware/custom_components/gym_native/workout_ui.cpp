@@ -55,7 +55,7 @@ void GymNative::render_session() {
   visible(session_label_, active && !has_status);
   visible(volume_title_, active && valid_ && !has_status);
   visible(volume_label_, active && valid_ && !has_status);
-  caption(volume_label_, weight_caption(session_volume_, volume_unit_));
+  caption(volume_label_, ui_.decimal(weight_caption(session_volume_, volume_unit_)));
   visible(session_button_, person_ >= 0 && !(valid_ && exercises_.empty() && session_id_.empty()));
   enabled(session_button_, plan_fresh() && !command_busy_ && (active || !exercises_.empty() || !routine_choices_.empty()));
   const bool complete = valid_ && active && session_phase_ == "active" && session_total_ > 0 &&
@@ -65,21 +65,21 @@ void GymNative::render_session() {
     style_button(session_button_, session_primary); session_button_primary_ = session_primary;
   }
   style_button(set_button_, !complete);
-  caption(session_text_, command_busy_ ? "Venter …" : active ? session_phase_ == "saving" ? "Lagrer økt …" : "Avslutt økt" : exercises_.empty() && !routine_choices_.empty() ? "Velg økt" : "Start økt");
+  caption(session_text_, command_busy_ ? ui_.tr("Venter …", "Please wait …") : active ? session_phase_ == "saving" ? ui_.tr("Lagrer økt …", "Saving workout …") : ui_.tr("Avslutt økt", "Finish workout") : exercises_.empty() && !routine_choices_.empty() ? ui_.tr("Velg økt", "Choose workout") : ui_.tr("Start økt", "Start workout"));
   visible(set_button_, valid_ && active && session_phase_ == "active" && !exercises_.empty());
   const auto progress = exercises_.empty() ? WorkoutProgress{} : workout_progress(exercises_[selected_].sets);
   enabled(set_button_, plan_fresh() && !command_busy_ && progress.next_row >= 0);
-  caption(lv_obj_get_child(set_button_, 0), progress.complete() ? "Øvelse fullført" : "Registrer sett");
-  if (active && !exercises_.empty()) caption(position_label_, "ØVELSE " + std::to_string(selected_ + 1) +
-      " AV " + std::to_string(exercises_.size()) + " · " + progress.next_caption());
+  caption(lv_obj_get_child(set_button_, 0), progress.complete() ? ui_.tr("Øvelse fullført", "Exercise complete") : ui_.tr("Registrer sett", "Log set"));
+  if (active && !exercises_.empty()) caption(position_label_, ui_.tr("ØVELSE ", "EXERCISE ") + std::to_string(selected_ + 1) +
+      ui_.tr(" AV ", " OF ") + std::to_string(exercises_.size()) + " · " + progress.next_caption(ui_));
   for (auto *day : days_) enabled(day, !active && !command_busy_);
   std::string summary;
   if (active && valid_) {
     const unsigned seconds = static_cast<unsigned>(std::min(31536000.0, session_elapsed_ + (millis() - elapsed_received_) / 1000.0));
     char time[24]; snprintf(time, sizeof(time), "%02u:%02u", seconds / 60, seconds % 60);
     summary = std::string(time) + " · " + std::to_string(session_done_) + "/" +
-        std::to_string(session_total_) + " sett";
-    if (session_phase_ == "saving") summary = paired_ ? "Lagrer i OpenGym …" : "Lagring venter på tilkobling";
+        std::to_string(session_total_) + ui_.tr(" sett", " sets");
+    if (session_phase_ == "saving") summary = paired_ ? ui_.tr("Lagrer i OpenGym …", "Saving to OpenGym …") : ui_.tr("Lagring venter på tilkobling", "Waiting to reconnect before saving");
   }
   caption(session_label_, summary);
 }
@@ -98,7 +98,7 @@ void GymNative::render_rest_day() {
   visible(rest_page_, resting);
   if (!resting) return;
   lv_obj_move_foreground(rest_page_);
-  caption(rest_heading_, routine_choices_.empty() ? "Hviledag" : "Dine økter");
+  caption(rest_heading_, routine_choices_.empty() ? ui_.tr("Hviledag", "Rest day") : ui_.tr("Dine økter", "Your workouts"));
   visible(rest_empty_, routine_choices_.empty());
   lv_obj_clean(rest_list_);
   binding_count_ = 192;  // Independent of modal bindings (128..191).
@@ -124,7 +124,7 @@ void GymNative::show_routines() {
   if (!valid_ || command_busy_ || !session_id_.empty() || routine_choices_.empty()) return;
   close_modal(); modal_kind_ = 4; binding_count_ = 128;
   modal_ = box(root_, 0, 0, 1280, 800, BG);
-  label(modal_, "Velg økt", 220, 60, 840, 70, large_);
+  label(modal_, ui_.tr("Velg økt", "Choose workout"), 220, 60, 840, 70, large_);
   label(modal_, people_[person_].name.c_str(), 220, 145, 840, 45, heading_, ACCENT);
   auto *list = box(modal_, 220, 218, 840, 380, BG, true);
   for (size_t i = 0; i < routine_choices_.size(); ++i) {
@@ -140,7 +140,7 @@ void GymNative::show_routines() {
       lv_obj_set_style_border_color(b, lv_color_hex(ACCENT), 0);
     }
   }
-  button(modal_, "Avbryt", 220, 659, 240, 65, 13);
+  button(modal_, ui_.tr("Avbryt", "Cancel"), 220, 659, 240, 65, 13);
 }
 
 void GymNative::choose_routine(int index) {
@@ -149,7 +149,7 @@ void GymNative::choose_routine(int index) {
   const std::string key = routine_choices_[index].key;
   close_modal();
   lock_request(); wanted_routine_ = key; wanted_day_ = day_; ++context_; unlock_request();
-  clear_plan("Henter økt …");
+  clear_plan(ui_.tr("Henter økt …", "Loading workout …"));
 }
 
 void GymNative::close_modal() {
@@ -166,24 +166,24 @@ void GymNative::show_finish() {
   if (command_busy_ || session_id_.empty()) return;
   close_modal(); modal_kind_ = 2; binding_count_ = 128;
   modal_ = box(root_, 0, 0, 1280, 800, BG);
-  label(modal_, "Avslutte økten?", 240, 165, 800, 70, large_);
-  const auto summary = std::to_string(session_done_) + " av " + std::to_string(session_total_) + " sett registrert";
+  label(modal_, ui_.tr("Avslutte økten?", "Finish this workout?"), 240, 165, 800, 70, large_);
+  const auto summary = std::to_string(session_done_) + ui_.tr(" av ", " of ") + std::to_string(session_total_) + ui_.tr(" sett registrert", " sets logged");
   label(modal_, summary.c_str(), 240, 258, 800, 50, heading_, ACCENT);
-  label(modal_, session_done_ ? "Bare utførte sett lagres i OpenGym." : "Ingen utførte sett. Økten avsluttes uten historikk.",
+  label(modal_, session_done_ ? ui_.tr("Bare utførte sett lagres i OpenGym.", "Only completed sets are saved to OpenGym.") : ui_.tr("Ingen utførte sett. Økten avsluttes uten historikk.", "No completed sets. Nothing will be saved."),
         240, 328, 800, 65, normal_, MUTED);
   modal_message_ = label(modal_, "", 240, 414, 800, 60, normal_, MUTED);
-  button(modal_, "Fortsett økt", 240, 505, 248, 70, 13);
-  button(modal_, "Forkast økt", 512, 505, 248, 70, 18);
-  button(modal_, session_done_ ? "Lagre og avslutt" : "Avslutt uten lagring", 784, 505, 272, 70, 17, 0, true);
+  button(modal_, ui_.tr("Fortsett økt", "Continue workout"), 240, 505, 248, 70, 13);
+  button(modal_, ui_.tr("Forkast økt", "Discard workout"), 512, 505, 248, 70, 18);
+  button(modal_, session_done_ ? ui_.tr("Lagre og avslutt", "Save and finish") : ui_.tr("Avslutt uten lagring", "Finish without saving"), 784, 505, 272, 70, 17, 0, true);
 }
 
 void GymNative::show_pair() {
   if (command_busy_ || person_ < 0) return;
   close_modal(); modal_kind_ = 3; binding_count_ = 128;
   modal_ = box(root_, 0, 0, 1280, 800, BG);
-  const auto title = "Koble til " + people_[person_].name;
+  const auto title = ui_.tr("Koble til ", "Pair ") + people_[person_].name;
   label(modal_, title.c_str(), 220, 45, 840, 60, large_);
-  label(modal_, "Åpne OpenGym med samme person på mobilen.\nSettings → Pair the mobile app. Skriv inn koden her.",
+  label(modal_, ui_.tr("Åpne OpenGym med samme person på mobilen.\nSettings → Pair the mobile app. Skriv inn koden her.", "Open the same profile in OpenGym on your phone.\nSettings → Pair the mobile app. Enter the code here."),
         220, 128, 840, 72, normal_, MUTED);
   pair_label_ = label(modal_, "— — — — — — — —", 220, 215, 840, 58, large_, ACCENT);
   static const char alphabet[] = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -192,9 +192,9 @@ void GymNative::show_pair() {
     button(modal_, key, 220 + (i % 8) * 106, 300 + (i / 8) * 67, 96, 57, 20, alphabet[i]);
   }
   modal_message_ = label(modal_, "", 220, 580, 840, 54, normal_, MUTED);
-  button(modal_, "Lukk", 220, 659, 240, 65, 13);
-  button(modal_, "Slett", 492, 659, 240, 65, 21);
-  button(modal_, "Koble til", 764, 659, 296, 65, 19, 0, true);
+  button(modal_, ui_.tr("Lukk", "Close"), 220, 659, 240, 65, 13);
+  button(modal_, ui_.tr("Slett", "Delete"), 492, 659, 240, 65, 21);
+  button(modal_, ui_.tr("Koble til", "Pair"), 764, 659, 296, 65, 19, 0, true);
 }
 
 void GymNative::next_set() {
@@ -203,7 +203,7 @@ void GymNative::next_set() {
   if (progress.next_row >= 0) {
     edit_set(progress.next_row * 3 + progress.next_side); return;
   }
-  update_status("Alle sett i denne øvelsen er registrert");
+  update_status(ui_.tr("Alle sett i denne øvelsen er registrert", "All sets for this exercise are logged"));
 }
 
 void GymNative::edit_set(int encoded) {
@@ -222,7 +222,7 @@ void GymNative::edit_set(int encoded) {
   lv_obj_set_height(exercise_title, title_height);
   lv_label_set_long_mode(exercise_title, LV_LABEL_LONG_DOT);
   const auto title = e.rows[row].name +
-      (side == 1 ? " · Venstre" : side == 2 ? " · Høyre" : "");
+      (side == 1 ? ui_.tr(" · Venstre", " · Left") : side == 2 ? ui_.tr(" · Høyre", " · Right") : "");
   label(modal_, title.c_str(), 88, 48 + title_height + 16, 1104, 44, heading_, ACCENT);
   editing_steps_.fill(1);
   const int fields[] = {e.mode == "cardio" ? 1 : 0, e.mode == "cardio" ? 2 : 1};
@@ -232,8 +232,8 @@ void GymNative::edit_set(int encoded) {
     lv_obj_set_style_radius(card, CARD_RADIUS, 0);
     lv_obj_set_style_border_width(card, 1, 0);
     lv_obj_set_style_border_color(card, lv_color_hex(RULE), 0);
-    const char *name = field == 0 ? "VEKT" : field == 2 ? "HASTIGHET" :
-        e.mode == "time" ? "TID" : e.mode == "cardio" ? "VARIGHET" : "REPETISJONER";
+    const char *name = field == 0 ? ui_.tr("VEKT", "WEIGHT") : field == 2 ? ui_.tr("HASTIGHET", "SPEED") :
+        e.mode == "time" ? ui_.tr("TID", "TIME") : e.mode == "cardio" ? ui_.tr("VARIGHET", "DURATION") : ui_.tr("REPETISJONER", "REPS");
     label(card, name, 32, 24, 472, 30, normal_, MUTED);
     if (field == 0) {
       auto *value_button = button(card, "", 132, 96, 272, 80, 27);
@@ -252,12 +252,12 @@ void GymNative::edit_set(int encoded) {
     lv_obj_set_style_text_font(lv_obj_get_child(plus, 0), heading_, 0);
     lv_obj_center(lv_obj_get_child(minus, 0));
     lv_obj_center(lv_obj_get_child(plus, 0));
-    label(card, "Trinn", 32, 204, 472, 24, small_, MUTED);
+    label(card, ui_.tr("Trinn", "Step"), 32, 204, 472, 24, small_, MUTED);
     const auto steps = field == 0 && e.weight_step > 0 ? std::vector<int>{1} : result_steps(field, e.mode);
     const char *weight_steps[] = {"0,1", "0,5", "1", "5"};
     const char *reps_steps[] = {"1", "5", "10"};
-    const char *time_steps[] = {"5 sek", "15 sek", "30 sek"};
-    const char *minute_steps[] = {"0,5 min", "1 min", "5 min"};
+    const char *time_steps[] = {ui_.tr("5 sek", "5 sec"), ui_.tr("15 sek", "15 sec"), ui_.tr("30 sek", "30 sec")};
+    const char *minute_steps[] = {ui_.tr("0,5 min", "0.5 min"), "1 min", "5 min"};
     const char *speed_steps[] = {"0,1", "0,5", "1"};
     for (size_t i = 0; i < steps.size(); ++i) {
       std::string key = field == 0 && e.weight_step > 0 ? "1 plate" :
@@ -270,9 +270,9 @@ void GymNative::edit_set(int encoded) {
     }
   }
   modal_message_ = label(modal_, "", 88, 574, 1104, 48, normal_, MUTED);
-  button(modal_, "Avbryt", 88, 648, editing_value_.done ? 252 : 536, 72, 13);
-  if (editing_value_.done) button(modal_, "Angre sett", 372, 648, 252, 72, 16);
-  button(modal_, editing_value_.done ? "Lagre endring" : "Registrer sett", 656, 648, 536, 72, 15, 0, true);
+  button(modal_, ui_.tr("Avbryt", "Cancel"), 88, 648, editing_value_.done ? 252 : 536, 72, 13);
+  if (editing_value_.done) button(modal_, ui_.tr("Angre sett", "Undo set"), 372, 648, 252, 72, 16);
+  button(modal_, editing_value_.done ? ui_.tr("Lagre endring", "Save changes") : ui_.tr("Registrer sett", "Log set"), 656, 648, 536, 72, 15, 0, true);
   update_editor();
 }
 
@@ -315,12 +315,12 @@ void GymNative::adjust_result(int encoded) {
 void GymNative::update_editor() {
   const auto &e = exercises_[selected_];
   char value[96];
-  caption(result_labels_[0], weight_caption(editing_value_.weight, e.unit));
-  if (e.mode == "time") snprintf(value, sizeof(value), "%.0f sek", editing_value_.seconds);
-  else if (e.mode == "cardio") snprintf(value, sizeof(value), "%s", weight_caption(editing_value_.minutes, "min").c_str());
+  caption(result_labels_[0], ui_.decimal(weight_caption(editing_value_.weight, e.unit)));
+  if (e.mode == "time") snprintf(value, sizeof(value), ui_.tr("%.0f sek", "%.0f sec"), editing_value_.seconds);
+  else if (e.mode == "cardio") snprintf(value, sizeof(value), "%s", ui_.decimal(weight_caption(editing_value_.minutes, "min")).c_str());
   else snprintf(value, sizeof(value), "%.0f reps", editing_value_.reps);
   caption(result_labels_[1], value);
-  caption(result_labels_[2], weight_caption(editing_value_.speed, "km/t"));
+  caption(result_labels_[2], ui_.decimal(weight_caption(editing_value_.speed, ui_.tr("km/t", "km/h"))));
   for (int field = 0; field < 3; ++field) {
     const auto steps = field == 0 && e.weight_step > 0 ? std::vector<int>{1} : result_steps(field, e.mode);
     for (size_t i = 0; i < steps.size(); ++i) if (step_buttons_[field][i]) {
@@ -384,13 +384,13 @@ void GymNative::submit(const std::string &action, bool done) {
   if (command_busy_ || !valid_ || person_ < 0) return;
   if (!allow_submission()) return;
   if (action == "pair" && pair_code_.size() != 8) {
-    caption(modal_message_, "Skriv inn alle 8 tegnene"); return;
+    caption(modal_message_, ui_.tr("Skriv inn alle 8 tegnene", "Enter all 8 characters")); return;
   }
   if ((action == "set" || action == "finish" || action == "discard") && session_id_.empty()) return;
   if (action == "start" && !session_id_.empty()) return;
   if (action == "set" && (selected_ < 0 || selected_ >= static_cast<int>(exercises_.size()) ||
       editing_row_ < 0 || editing_row_ >= static_cast<int>(exercises_[selected_].sets.size()))) {
-    close_modal(); update_status("Økten er oppdatert · prøv igjen", true); return;
+    close_modal(); update_status(ui_.tr("Økten er oppdatert · prøv igjen", "Workout updated · try again"), true); return;
   }
   char nonce[40]; snprintf(nonce, sizeof(nonce), "%08lx%08lx%08lx%08lx",
       static_cast<unsigned long>(esp_random()), static_cast<unsigned long>(esp_random()),
@@ -421,8 +421,8 @@ void GymNative::submit(const std::string &action, bool done) {
   }
   command_busy_ = true; command_action_ = action;
   lock_request(); wanted_command_ = payload; unlock_request();
-  update_status(action == "finish" ? "Lagrer økten i OpenGym …" : "Venter på bekreftelse …");
-  caption(modal_message_, action == "finish" ? "Lagrer økten i OpenGym …" : "Venter på bekreftelse …");
+  update_status(action == "finish" ? ui_.tr("Lagrer økten i OpenGym …", "Saving workout to OpenGym …") : ui_.tr("Venter på bekreftelse …", "Waiting for confirmation …"));
+  caption(modal_message_, action == "finish" ? ui_.tr("Lagrer økten i OpenGym …", "Saving workout to OpenGym …") : ui_.tr("Venter på bekreftelse …", "Waiting for confirmation …"));
   render_session();
 }
 }  // namespace esphome::gym_native

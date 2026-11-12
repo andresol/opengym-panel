@@ -28,14 +28,17 @@ python3 tools/setup.py \
   --api-url http://host.docker.internal:8888 \
   --panel-url http://192.0.2.10:8893 \
   --bind-address 192.0.2.10 \
+  --language nb \
   --output /srv/opengym-panel \
   --uid 1000 --gid 1000
 ```
 
 Run this in your source checkout **on the companion host**; generated build
 contexts point to that checkout. It does not send data or start anything.
-It creates mode-0600 service configs, a fresh ESPHome secrets file and a Compose
-file. The output directory must not already exist. Running as root assigns the
+It creates mode-0600 service configs, a fresh ESPHome secrets file, a Compose
+file and an `installation.json` with matching language/timezone settings. Choose
+`--language en` for English, or `nb` (the default) for Norwegian Bokmål.
+The output directory must not already exist. Running as root assigns the
 new files to the selected non-root UID/GID; without root use your own UID/GID.
 Nothing changes ownership or permissions in OpenGym's data directory.
 
@@ -69,17 +72,19 @@ values are already unique and match the companions. Copy it privately to
 `firmware/secrets.yaml` in your checkout; it is Git-ignored and excluded from the
 Docker build context. The file also holds your browser-admin password.
 
-The base firmware uses DHCP and Europe/Oslo time. To use another device name,
-timezone, server address or static network, make a private copy of
-`config/installation.example.json`, then run:
+The base firmware uses DHCP, Europe/Oslo time and Norwegian. Generate a wrapper
+from setup's private `installation.json` to use the same language and timezone
+as the companion. For additional device/network choices, use a private copy of
+`config/installation.example.json`:
 
 ```sh
-python3 tools/configure_installation.py --config /srv/private/installation.json --name my-gym
+python3 tools/configure_installation.py --config /srv/opengym-panel/installation.json --name my-gym
 ```
 
 `firmware/my-gym.local.yaml` includes the supported application. Static mode
 requires a valid address, subnet, gateway and DNS; DHCP is the default. Set the
-**same timezone** in setup and the firmware wrapper. Only `nb` is implemented.
+**same timezone and language** in setup and the firmware wrapper. `nb` and `en`
+are supported; see [languages](LANGUAGES.md).
 Use [the build guide](BUILDING.md) to validate/compile that exact entry.
 
 ## 5. Pair and accept

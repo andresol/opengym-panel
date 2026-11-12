@@ -19,6 +19,7 @@
 #include "display_policy.h"
 #include "ui_style.h"
 #include "workout_progress.h"
+#include "ui_text.h"
 #include "person_handoff.h"
 #include "esphome/core/preferences.h"
 #include "esphome/components/light/light_state.h"
@@ -57,6 +58,7 @@ struct Exercise {
 class GymNative : public Component, public AsyncWebHandler {
  public:
   void set_timezone(const std::string &value) { timezone_ = value; }
+  void set_language(const std::string &value) { ui_.english = value == "en"; }
   void set_url(const std::string &value) { url_ = value; }
   void set_token(const std::string &value) { token_ = value; }
   void set_write_token(const std::string &value) { write_token_ = value; }
@@ -229,6 +231,7 @@ class GymNative : public Component, public AsyncWebHandler {
   uint32_t last_admin_snapshot_ = 0, settings_store_sequence_ = 0;
   std::string admin_snapshot_;
   std::string timezone_{"Europe/Oslo"};
+  UiText ui_;
   std::array<std::string, 8> admin_routes_{};
   lv_image_dsc_t image_descriptor_{};
   const lv_font_t *small_ = nullptr, *normal_ = nullptr, *heading_ = nullptr, *large_ = nullptr;

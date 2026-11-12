@@ -20,5 +20,11 @@ test('timezone override changes both local date and planned weekday at the same 
 test('bad timezone or unimplemented UI language fails explicitly rather than guessing',()=>{
   assert.notEqual(dates({PANEL_TIMEZONE:'Not/A_Zone'}).status,0);
   assert.notEqual(dates({PANEL_TIMEZONE:''}).status,0);
-  assert.notEqual(dates({PANEL_LANGUAGE:'en'}).status,0);
+  assert.notEqual(dates({PANEL_LANGUAGE:'fr'}).status,0);
+});
+
+test('English uses the same dates and timezone rules as Norwegian', () => {
+  const result = dates({ PANEL_LANGUAGE: 'en' });
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(JSON.parse(result.stdout), JSON.parse(dates().stdout));
 });

@@ -12,6 +12,9 @@ class WeightPickerTests(unittest.TestCase):
     def test_picker_lifecycle_and_local_only_changes(self):
         source = (COMPONENT / 'weight_picker.cpp').read_text().replace('#include "gym_native.h"', '')
         harness = r'''
+#include "ui_text.h"
+esphome::gym_native::UiText ui_;
+
 #include "weight_control.h"
 #include "ui_style.h"
 #include <cassert>

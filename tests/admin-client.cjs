@@ -3,7 +3,9 @@ const {parseHTML}=require(process.env.LINKEDOM_MODULE||'linkedom');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
 (async()=>{
  const header=fs.readFileSync(path.join(__dirname,'../firmware/custom_components/gym_native/admin_page.h'),'utf8');
- const html=header.split('R"HTML(')[1].split(')HTML";')[0];
+ const html=process.env.ADMIN_HTML_PATH ? fs.readFileSync(process.env.ADMIN_HTML_PATH,'utf8') : header.split('R"HTML(')[1].split(')HTML";')[0];
+ const english=process.env.PANEL_TEST_LANGUAGE==='en';
+ const text=(nb,en)=>english?en:nb;
  const {window,document}=parseHTML(html);const $=id=>document.getElementById(id);
  // Linkedom's select has a getter only, unlike a browser HTMLSelectElement.
  Object.defineProperty($('wake'),'value',{value:'5',writable:true});
@@ -26,16 +28,16 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),asse
  vm.createContext(ctx);vm.runInContext(html.match(/<script>([\s\S]*?)<\/script>/)[1],ctx);
  const settle=async()=>{for(let i=0;i<100;i++)await Promise.resolve();};
  const fire=(id,type)=>$(id).dispatchEvent(new window.Event(type,{bubbles:true,cancelable:true}));
- await settle();assert.equal($('display').textContent,'Av');assert.equal($('version').textContent,'1.1.14');assert.equal($('start').value,'23:00');assert.equal($('end').value,'07:00');assert.equal(calls.filter(c=>c.method==='POST').length,0);
+ await settle();assert.equal($('display').textContent,text('Av','Off'));assert.equal($('version').textContent,'1.1.14');assert.equal($('start').value,'23:00');assert.equal($('end').value,'07:00');assert.equal(calls.filter(c=>c.method==='POST').length,0);
  $('day').value='70';fire('day','input');state.dayBrightness=90;intervals[0]();await settle();assert.equal($('day').value,'70','Polling must not erase an edit');
- fire('settings','submit');await settle();assert.equal(state.dayBrightness,70);assert.equal(state.storeSequence,1);assert.equal($('result').textContent,'Innstillingene er lagret.');assert(calls.some(c=>c.path==='/button/Lagre%20skjerminnstillinger/press'));
+ fire('settings','submit');await settle();assert.equal(state.dayBrightness,70);assert.equal(state.storeSequence,1);assert.equal($('result').textContent,text('Innstillingene er lagret.','Settings saved.'));assert(calls.some(c=>c.path==='/button/Lagre%20skjerminnstillinger/press'));
  assert(calls.some(c=>c.path==='/number/Lys%20dag/set'));
  state.routes.light='Skjermlys · test';intervals[0]();await settle();
- fire('on','click');await settle();assert(calls.some(c=>c.path==='/light/Skjermlys%20%C2%B7%20test/turn_on'));assert.equal(state.displayOn,true);assert.equal($('display').textContent,'På · 20 %');
+ fire('on','click');await settle();assert(calls.some(c=>c.path==='/light/Skjermlys%20%C2%B7%20test/turn_on'));assert.equal(state.displayOn,true);assert.equal($('display').textContent,text('På · 20 %','On · 20 %'));
  fire('off','click');await settle();assert.equal(state.displayOn,false);
  const writes=calls.filter(c=>c.method==='POST').length;
- $('start').value='07:00';fire('start','input');fire('settings','submit');await settle();assert.equal(calls.filter(c=>c.method==='POST').length,writes);assert($('result').textContent.includes('forskjellig start'));
- $('start').value='23:00';$('day').value='60';fire('day','input');fail=true;fire('settings','submit');await settle();assert($('result').classList.contains('error'));assert(!$('result').textContent.includes('er lagret'));assert.equal(state.dayBrightness,70);
+ $('start').value='07:00';fire('start','input');fire('settings','submit');await settle();assert.equal(calls.filter(c=>c.method==='POST').length,writes);assert($('result').textContent.includes(text('forskjellig start','different start')));
+ $('start').value='23:00';$('day').value='60';fire('day','input');fail=true;fire('settings','submit');await settle();assert($('result').classList.contains('error'));assert(!$('result').textContent.includes(text('er lagret','Settings saved')));assert.equal(state.dayBrightness,70);
  assert.equal(document.querySelector('a[download]').getAttribute('href'),'/admin/diagnostics.json');
  assert(!/https?:\/\//.test(html),'Admin assets must be embedded/same-origin');
  console.log('Admin client: read-only load, dirty edit protection, confirmed save+sync, manual wake/off, validation and honest write failure passed');

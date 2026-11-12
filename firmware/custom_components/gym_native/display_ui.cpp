@@ -78,6 +78,7 @@ void GymNative::update_admin_snapshot() {
     root["clockValid"] = now.is_valid();
     root["localTime"] = now.is_valid() ? now.strftime("%d.%m.%Y %H:%M:%S") : "";
     root["timezone"] = timezone_;
+    root["language"] = ui_.english ? "en" : "nb";
     root["displayOn"] = backlight_->current_values.is_on();
     root["brightness"] = static_cast<int>(std::lround(backlight_->current_values.get_brightness() * 100));
     root["nightActive"] = display_policy_.night(now.is_valid(), now.hour * 60 + now.minute);
@@ -121,7 +122,7 @@ void GymNative::handleRequest(AsyncWebServerRequest *request) {
   AsyncWebServerResponse *response;
   if (url == "/admin" || url == "/admin/") {
     response = request->beginResponse(200, "text/html; charset=utf-8",
-        reinterpret_cast<const uint8_t *>(ADMIN_PAGE), sizeof(ADMIN_PAGE) - 1);
+        admin_page(ui_));
     response->addHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'");
   } else {
     // HTTP runs on its own task. Never inspect LVGL or mutable session objects here.

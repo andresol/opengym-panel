@@ -7,7 +7,7 @@ picking up your phone.
 Built for the Guition JC8012P4A1 v3, with an ESP32-P4 and a 1280×800 display.
 This is an independent companion project.
 
-**Status:** Early community release (`1.1.32-community.1`). The training workflow
+**Status:** Early community release (`1.1.33-community.1`). The training workflow
 is in use on one panel; the installer and community firmware still need testing
 on other setups.
 
@@ -46,7 +46,7 @@ placeholder; see [media setup and rights](docs/MEDIA.md) for your own images.
 | OpenGym | Self-hosted **1.4.4** |
 | Companion host | Linux with Docker Engine and Compose |
 | Firmware | ESPHome **2026.10.0**, ESP-IDF **5.5.5** |
-| Interface language | Norwegian (`nb`) |
+| Interface languages | Norwegian Bokmål (`nb`) and English (`en`) |
 
 The panel and companion host need to be on a trusted local network or VPN.
 Other boards and OpenGym versions haven't been verified. See the
@@ -64,6 +64,9 @@ The [installation guide](docs/INSTALL.md) covers the full setup. In brief:
    [build the firmware](docs/BUILDING.md) for your panel.
 4. Pair each profile from the screen using **Settings → Pair the mobile app**
    in the corresponding OpenGym account.
+
+Norwegian is the default. Add `--language en` during setup for English;
+see [language configuration](docs/LANGUAGES.md) for the matching firmware settings.
 
 ## How it works
 

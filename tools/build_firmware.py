@@ -27,11 +27,15 @@ if __name__ == "__main__":
     parser.add_argument("--synthetic", action="store_true", help="Build isolated, non-installable CI firmware")
     parser.add_argument("--config-only", action="store_true")
     parser.add_argument("--entry", default="firmware/opengym-v3.yaml")
+    parser.add_argument("--language", choices=['nb', 'en'], default='nb',
+                        help="Language for the isolated synthetic build; real builds use their installation config")
     args = parser.parse_args()
     version = subprocess.check_output(["esphome", "version"], text=True).strip()
     if version != "Version: 2026.10.0":
         raise SystemExit("Use ESPHome 2026.10.0 from requirements-firmware.txt")
     if not args.synthetic:
+        if args.language != 'nb':
+            raise SystemExit("Real builds use locale.language in the installation wrapper, not --language")
         entry = (ROOT / args.entry).resolve(strict=True)
         if not entry.is_relative_to(ROOT / "firmware"):
             raise SystemExit("Firmware entry must stay inside firmware/")
@@ -46,17 +50,20 @@ if __name__ == "__main__":
         shutil.copytree(ROOT / "firmware", scratch / "firmware",
                         ignore=shutil.ignore_patterns("secrets.yaml", "*.local.*", ".esphome", "__pycache__"))
         (scratch / "firmware/secrets.yaml").write_text("".join(k + ": " + json.dumps(v) + "\n" for k, v in synthetic_secrets().items()))
+        entry = "firmware/language-check.local.yaml"
+        (scratch / entry).write_text("packages:\n  production: !include opengym-v3.yaml\n"
+                                     "substitutions:\n  panel_language: " + args.language + "\n")
         env = {**os.environ, "ESPHOME_BUILD_PATH": str(scratch / "build"),
                "ESPHOME_DEFAULT_COMPILE_PROCESS_LIMIT": "2"}
         # Config output can contain secrets in a real build, so CI uses synthetic values only.
-        subprocess.run(["esphome", "config", args.entry], cwd=scratch, env=env, check=True)
+        subprocess.run(["esphome", "config", entry], cwd=scratch, env=env, check=True)
         if args.config_only:
             raise SystemExit(0)
-        subprocess.run(["esphome", "compile", args.entry], cwd=scratch, env=env, check=True)
+        subprocess.run(["esphome", "compile", entry], cwd=scratch, env=env, check=True)
         images = list((scratch / "build").rglob("firmware.ota.bin"))
         if len(images) != 1:
             raise SystemExit("Expected exactly one fresh OTA image")
-        destination = ROOT / "dist/compile-check"
+        destination = ROOT / "dist/compile-check" / args.language
         destination.mkdir(parents=True, exist_ok=True)
         outputs = []
         for name in ["firmware.ota.bin", "firmware.factory.bin", "firmware.elf"]:
@@ -68,7 +75,8 @@ if __name__ == "__main__":
             outputs.append(target)
         metadata = destination / "compile.json"
         metadata.write_text(json.dumps({"synthetic": True, "installation_ready": False,
-            "esphome": "2026.10.0", "project_version": json.loads((ROOT / "package.json").read_text())["version"],
+            "esphome": "2026.10.0", "language": args.language,
+            "project_version": json.loads((ROOT / "package.json").read_text())["version"],
             "physical_verification": False, "ota_performed": False}, indent=2) + "\n")
         outputs.append(metadata)
         (destination / "SHA256SUMS").write_text("".join(hashlib.sha256(p.read_bytes()).hexdigest() + "  " + p.name + "\n" for p in outputs))

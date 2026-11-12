@@ -13,14 +13,34 @@ parents = {'root_': (1280, 800)}
 observed = []
 rectangles = {}
 origins = {'root_': (0, 0)}
+
+
+def call_arguments(raw):
+    # Ignore caption contents, then split only top-level commas. Locale helpers
+    # and other nested calls are a single argument, not geometry coordinates.
+    raw = re.sub(r'"(?:\\.|[^"\\])*"', 'TEXT', raw)
+    parts, current, depth = [], [], 0
+    for character in raw:
+        if character in '([{':
+            depth += 1
+        elif character in ')]}':
+            depth -= 1
+        if character == ',' and depth == 0:
+            parts.append(''.join(current))
+            current = []
+        else:
+            current.append(character)
+    assert depth == 0, raw
+    return parts + [''.join(current)]
+
+
 for line in begin.splitlines():
     match = re.search(r'(?:auto \*(\w+)|([\w\[\]]+))\s*=\s*(box|label|button)\((.*)\);', line)
     unnamed = re.search(r'^\s*(label)\((.*)\);', line)
     if not match and not unnamed:
         continue
     name, kind, raw = ((match[1] or match[2]), match[3], match[4]) if match else ('label', unnamed[1], unnamed[2])
-    # All call strings here contain no embedded commas. Remove strings before splitting.
-    args = re.sub(r'"(?:\\.|[^"\\])*"', 'TEXT', raw).split(',')
+    args = call_arguments(raw)
     parent = args[0].strip()
     offset = 1 if kind == 'box' else 2
     if parent not in parents:
@@ -220,7 +240,7 @@ print('Fixed media envelope/control bounds and compact summary/fallback passed')
 # One restrained completion glyph: correct font subset and a dedicated tile slot.
 assert 'label(b, "✓", 220, 23, 24, 24, normal_, ACCENT)' in source
 assert 'label(b, "Fullført"' not in source
-assert 'is_next ? "NESTE" : "✓"' in source
+assert 'is_next ? ui_.tr("NESTE", "NEXT") : "✓"' in source
 assert 'is_next ? small_ : normal_' in source
 assert 'lv_obj_set_width(name, complete ? 188 : 228)' in source
 assert 'lv_obj_set_height(name, complete ? 46 : LV_SIZE_CONTENT)' in source

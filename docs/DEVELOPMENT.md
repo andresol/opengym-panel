@@ -13,7 +13,7 @@ repository. Public contributions are tested here before the maintainer ports
 them to the production source; no blind bidirectional directory mirroring is used.
 
 The numeric base version identifies related source lines, for example production
-`1.1.32` and community `1.1.32-community.1`. Community suffixes describe generic
+`1.1.33` and community `1.1.33-community.1`. Community suffixes describe generic
 installer/documentation revisions. They do not prove that a private device is
 running that source. Existing releases remain immutable snapshots; a new commit
 does not silently replace an older release archive.

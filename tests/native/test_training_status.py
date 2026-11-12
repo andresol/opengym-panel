@@ -19,7 +19,10 @@ class TrainingStatusTests(unittest.TestCase):
         timer = cpp.split('void GymNative::render_timer() {', 1)[1].split('\n}', 1)[0]
         style = cpp.split('void GymNative::style_button(', 1)[1].split('\n}', 1)[0]
         style = 'void style_button(' + style + '\n}\n'
-        prefix = r'''#include "workout_progress.h"
+        prefix = r'''
+#include "ui_text.h"
+esphome::gym_native::UiText ui_;
+#include "workout_progress.h"
 #include "ui_style.h"
 #include "timer.h"
 #include <cassert>

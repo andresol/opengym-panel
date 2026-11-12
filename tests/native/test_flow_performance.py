@@ -21,6 +21,8 @@ class FlowPerformanceTests(unittest.TestCase):
 
     def test_progress_pairs_warmups_undo_and_decimal(self):
         self.compile_run(r'''
+#include "ui_text.h"
+esphome::gym_native::UiText ui_;
 #include "workout_progress.h"
 #include <vector>
 #include <cassert>
@@ -54,6 +56,8 @@ int main() {
         worker = 'void GymNative::worker()'+worker
         media = (COMPONENT/'media_worker.cpp').read_text().split('namespace esphome::gym_native {',1)[1].rsplit('}  // namespace',1)[0]
         prefix = r'''
+#include "ui_text.h"
+esphome::gym_native::UiText ui_;
 #include "media_cache.h"
 #include <atomic>
 #include <cassert>

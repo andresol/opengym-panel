@@ -19,12 +19,14 @@ ESPHome container, not a private image or credentials.
 ```sh
 python3 -m pip install -r requirements-firmware.txt
 # CI-style isolated compile, with no real network/profile credentials:
-python3 tools/build_firmware.py --synthetic
+python3 tools/build_firmware.py --synthetic --language en
 ```
 
 Synthetic output is explicitly named **SYNTHETIC-NOT-FOR-INSTALL**. It is a full
 compile check with matching OTA/factory/ELF and checksums, not a provisioned
 release or a physical test. It never overwrites a local secrets file.
+Use `--language nb` to compile-check Norwegian. Outputs are separated by language
+under `dist/compile-check/`; real builds use the language in their local wrapper.
 
 For your actual installation, provision `firmware/secrets.yaml` as described in
 [INSTALL.md](INSTALL.md), then validate/compile your local wrapper:

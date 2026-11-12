@@ -8,6 +8,9 @@ constexpr unsigned WIDTH = 384, HEIGHT = 320;
 const char *NAMES[] = {"Nakke / øvre rygg", "Skuldre", "Bryst", "Øvre rygg", "Serratus",
     "Biceps", "Triceps", "Underarmer", "Mage", "Skrå magemuskler", "Korsrygg",
     "Sete", "Forside lår", "Bakside lår", "Innside lår", "Hoftebøyere", "Legger", "Forside legg"};
+const char *EN_NAMES[] = {"Traps / upper back", "Shoulders", "Chest", "Upper back", "Serratus",
+    "Biceps", "Triceps", "Forearms", "Abs", "Obliques", "Lower back",
+    "Glutes", "Quads", "Hamstrings", "Adductors", "Hip flexors", "Calves", "Shins"};
 uint16_t rgb565(uint32_t c) { return ((c >> 8) & 0xf800) | ((c >> 5) & 0x07e0) | ((c >> 3) & 0x001f); }
 }
 
@@ -52,7 +55,7 @@ void GymNative::show_muscles() {
   if (!valid_ || exercises_.empty() || command_busy_ || !muscle_pixels_.data()) return;
   close_modal(); modal_kind_ = 5; binding_count_ = 128;
   modal_ = box(root_, 0, 0, 1280, 800, BG);
-  label(modal_, "Muskler i økten", 88, 48, 1104, 64, large_);
+  label(modal_, ui_.tr("Muskler i økten", "Workout muscles"), 88, 48, 1104, 64, large_);
   label(modal_, title_.c_str(), 88, 120, 1104, 60, heading_, MUTED);
   auto *map = lv_image_create(modal_);
   lv_image_set_src(map, &muscle_descriptor_);
@@ -62,10 +65,10 @@ void GymNative::show_muscles() {
   auto *list = box(modal_, 712, 200, 480, 436, BG, true);
   unsigned row = 0;
   for (unsigned m = 0; m < muscle_weights_.size(); ++m) if (muscle_weights_[m] > 0) {
-    label(list, NAMES[m], 0, row++ * 44, 456, 40, normal_,
+    label(list, ui_.english ? EN_NAMES[m] : NAMES[m], 0, row++ * 44, 456, 40, normal_,
           muscle_weights_[m] >= 0.9f ? ACCENT : MUTED);
   }
-  if (!row) label(list, "Ingen muskeldata", 0, 0, 456, 44, normal_, MUTED);
-  button(modal_, "Lukk", 712, 680, 480, 72, 13);
+  if (!row) label(list, ui_.tr("Ingen muskeldata", "No muscle data"), 0, 0, 456, 44, normal_, MUTED);
+  button(modal_, ui_.tr("Lukk", "Close"), 712, 680, 480, 72, 13);
 }
 }  // namespace esphome::gym_native

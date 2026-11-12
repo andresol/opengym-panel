@@ -18,6 +18,8 @@ class RestNavigationTests(unittest.TestCase):
         method = cpp.split('void GymNative::choose_exercise(', 1)[1]
         method = 'void GymNative::choose_exercise(' + method.split('void GymNative::request_media(', 1)[0]
         source = r'''
+#include "ui_text.h"
+esphome::gym_native::UiText ui_;
 #include "timer.h"
 #include "set_feedback.h"
 #include <cassert>

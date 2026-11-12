@@ -18,6 +18,8 @@ class PersonHandoffTests(unittest.TestCase):
         production = source.split('void GymNative::clear_plan(', 1)[1].split('void GymNative::choose_day(', 1)[0]
         production = 'void GymNative::clear_plan(' + production
         prefix = r'''
+#include "ui_text.h"
+esphome::gym_native::UiText ui_;
 #include "person_handoff.h"
 #include "timer.h"
 #include <array>

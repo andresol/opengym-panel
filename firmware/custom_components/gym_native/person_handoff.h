@@ -1,6 +1,7 @@
 #pragma once
 #include <cstddef>
 #include <string>
+#include "ui_text.h"
 
 namespace esphome::gym_native {
 enum class Handoff { NONE, SAVED, CLOSED, DISCARDED };
@@ -21,12 +22,12 @@ inline Handoff completed_handoff(const std::string &previous, const std::string 
   return Handoff::NONE;
 }
 
-inline const char *handoff_caption(Handoff result) {
+inline const char *handoff_caption(Handoff result, const UiText &ui = {}) {
   switch (result) {
-    case Handoff::SAVED: return "Økten er lagret i OpenGym";
-    case Handoff::CLOSED: return "Økten er avsluttet uten lagring";
-    case Handoff::DISCARDED: return "Økten er forkastet";
-    default: return "Klar for trening";
+    case Handoff::SAVED: return ui.tr("Økten er lagret i OpenGym", "Workout saved to OpenGym");
+    case Handoff::CLOSED: return ui.tr("Økten er avsluttet uten lagring", "Workout finished without saving");
+    case Handoff::DISCARDED: return ui.tr("Økten er forkastet", "Workout discarded");
+    default: return ui.tr("Klar for trening", "Ready to train");
   }
 }
 

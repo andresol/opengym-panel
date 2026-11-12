@@ -63,6 +63,24 @@ class PublicInstallTests(unittest.TestCase):
                 setup.prepare(args)
             self.assertEqual(source.read_bytes(), before)
 
+    def test_english_setup_keeps_firmware_and_companion_language_in_step(self):
+        with tempfile.TemporaryDirectory() as directory:
+            args = self.arguments(directory)
+            args.language = 'en'
+            out = setup.prepare(args)
+            compose = json.loads((out / 'compose.yaml').read_text())
+            installation = json.loads((out / 'installation.json').read_text())
+            self.assertEqual(compose['services']['sessions']['environment']['PANEL_LANGUAGE'], 'en')
+            self.assertEqual(installation['locale']['language'], 'en')
+            self.assertEqual(installation['locale']['timezone'], args.timezone)
+            from importlib.util import spec_from_file_location, module_from_spec
+            spec = spec_from_file_location('installation_locale', ROOT / 'tools/configure_installation.py')
+            config = module_from_spec(spec)
+            spec.loader.exec_module(config)
+            wrapper, env = config.render(config.validate(installation))
+            self.assertIn('panel_language: "en"', wrapper)
+            self.assertIn('PANEL_LANGUAGE="en"', env)
+
     def test_duplicate_profiles_and_missing_state_fail_before_output(self):
         with tempfile.TemporaryDirectory() as directory:
             args = self.arguments(directory)

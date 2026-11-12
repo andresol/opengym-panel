@@ -13,7 +13,7 @@ for i in range(32):
     assert x+96<=1060 and y+57<=558
 assert 128+32+3<=192
 assert 128+32+1<=192  # own-routine picker, separate from the set-row bindings
-assert '"Bytt økt", 24, 616, 260, 64, 22' in (root/'firmware/custom_components/gym_native/gym_native.cpp').read_text()
+assert 'ui_.tr("Bytt økt", "Change workout"), 24, 616, 260, 64, 22' in (root/'firmware/custom_components/gym_native/gym_native.cpp').read_text()
 # Two equal adjustable cards; every child stays inside its visible card.
 for line in range(2):
     x,y,w,h=88+line*568,224,536,328

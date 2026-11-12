@@ -65,6 +65,8 @@ def prepare(args):
     if urlsplit(panel_url).scheme != "http":
         raise ValueError("The ESP32 transport currently supports a trusted-LAN HTTP panel URL")
     ZoneInfo(args.timezone)
+    if args.language not in ('nb', 'en'):
+        raise ValueError('Choose nb (Norwegian Bokmål) or en (English)')
     address = ipaddress.ip_address(args.bind_address)
     if address.is_unspecified or address.is_multicast or address.is_loopback:
         raise ValueError("Bind to one explicit LAN address reachable by the panel")
@@ -104,7 +106,10 @@ def prepare(args):
         }
         files = {"sessions.json": json.dumps(session, indent=2) + "\n",
                  "native.json": json.dumps(native, indent=2) + "\n",
-                 "secrets.yaml": "".join(k + ": " + json.dumps(v) + "\n" for k, v in credentials.items())}
+                 "secrets.yaml": "".join(k + ": " + json.dumps(v) + "\n" for k, v in credentials.items()),
+                 "installation.json": json.dumps({"schema": 1,
+                     "locale": {"timezone": args.timezone, "language": args.language},
+                     "services": {"panel_url": panel_url}}, indent=2) + "\n"}
         common = {"restart": "unless-stopped", "read_only": True,
                   "user": f"{args.uid}:{args.gid}", "cap_drop": ["ALL"],
                   "security_opt": ["no-new-privileges:true"], "pids_limit": 64,
@@ -116,7 +121,7 @@ def prepare(args):
             "sessions": {**common, "build": {"context": str(ROOT), "dockerfile": "sessions/Dockerfile"},
                 "mem_limit": "256m", "cpus": 1,
                 "environment": {"SESSION_CONFIG": "/run/panel/sessions.json", "DATA_DIR": "/data",
-                    "SESSION_DIR": "/sessions", "PANEL_TIMEZONE": args.timezone, "PANEL_LANGUAGE": "nb"},
+                    "SESSION_DIR": "/sessions", "PANEL_TIMEZONE": args.timezone, "PANEL_LANGUAGE": args.language},
                 "extra_hosts": ["host.docker.internal:host-gateway"],
                 "volumes": [mount(data, "/data"), mount(output / "sessions.json", "/run/panel/sessions.json"),
                             mount(output / "sessions", "/sessions", False)],
@@ -153,6 +158,7 @@ def parser():
     result.add_argument("--bind-address", required=True)
     result.add_argument("--output", required=True)
     result.add_argument("--timezone", default="Europe/Oslo")
+    result.add_argument("--language", choices=['nb', 'en'], default='nb')
     result.add_argument("--uid", type=int, default=os.getuid() or 1000)
     result.add_argument("--gid", type=int, default=os.getgid() or 1000)
     return result

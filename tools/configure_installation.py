@@ -62,8 +62,8 @@ def validate(config):
     except (ZoneInfoNotFoundError, ValueError) as e:
         raise ValueError('Invalid IANA timezone') from e
     values['panel_language'] = locale.get('language', values['panel_language'])
-    if values['panel_language'] != 'nb':
-        raise ValueError('Only the existing nb UI is supported; translation is not part of this step')
+    if values['panel_language'] not in ('nb', 'en'):
+        raise ValueError('Choose nb (Norwegian Bokmål) or en (English)')
     mode = network.get('mode', 'dhcp')
     if mode not in ('dhcp', 'static'):
         raise ValueError('Network mode must be dhcp or static')

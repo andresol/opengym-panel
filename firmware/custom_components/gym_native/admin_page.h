@@ -1,4 +1,6 @@
 #pragma once
+#include "ui_text.h"
+#include <string>
 namespace esphome::gym_native {
 inline constexpr char ADMIN_PAGE[] = R"HTML(<!doctype html>
 <html lang="nb"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OpenGym · Skjerminnstillinger</title>
@@ -38,4 +40,73 @@ $('address').textContent=window.location.host;
 load().catch(e=>message(e.message,true));setInterval(()=>{if(!busy)load().catch(e=>{$('connection').textContent='Ingen forbindelse';message(e.message,true);});},8000);
 </script></html>
 )HTML";
+
+// Translates only the embedded static page, never live values or service routes.
+inline std::string admin_page(const UiText &ui) {
+  std::string page = ADMIN_PAGE;
+  if (!ui.english) return page;
+  const char *translations[][2] = {
+    {"Versjon, tilkobling og skjerminnstillinger. Ingen passord eller treningshistorikk.", "Version, connection and display settings. No passwords or workout history."},
+    {"Endringen er ikke bekreftet. Hent status og prøv igjen.", "Change not confirmed. Refresh the status and try again."},
+    {"Velg forskjellig start og slutt for nattmodus.", "Choose different start and end times for night mode."},
+    {"Endringene kunne ikke lagres i fast minne.", "Could not save settings to persistent storage."},
+    {"Skjermen svarte ikke som forventet (", "Unexpected display response ("},
+    {"Våken etter berøring om natten", "Stay awake after a night-time touch"},
+    {"Velg et gyldig klokkeslett.", "Choose a valid time."},
+    {"Innstillingene er lagret.", "Settings saved."},
+    {"Treningsskjermen hjemme", "OpenGym training display"},
+    {"Henter skjermstatus …", "Loading display status …"},
+    {"OpenGym treningspanel", "OpenGym training display"},
+    {"Last ned diagnostikk", "Download diagnostics"},
+    {"Ugyldig klokkeslett.", "Invalid time."},
+    {"Skjerminnstillinger", "Display settings"},
+    {"Lysstyrke på dagtid", "Daytime brightness"},
+    {"Lys ved nattvekking", "Night wake brightness"},
+    {"Lagre innstillinger", "Save settings"},
+    {"Innlogging kreves.", "Sign in to continue."},
+    {"Ulagrede endringer", "Unsaved changes"},
+    {"Slukker skjermen …", "Turning display off …"},
+    {"Ikke synkronisert", "Not synchronized"},
+    {"Vekker skjermen …", "Waking display …"},
+    {"Ingen forbindelse", "No connection"},
+    {"Lys og nattmodus", "Brightness and night mode"},
+    {"Wi-Fi frakoblet", "Wi-Fi disconnected"},
+    {"Skjermen er på.", "Display is on."},
+    {"Skjermen er av.", "Display is off."},
+    {"Slukk skjermen", "Turn display off"},
+    {"Vekk skjermen", "Wake display"},
+    {"10 minutter", "10 minutes"},
+    {"15 minutter", "15 minutes"},
+    {"30 minutter", "30 minutes"},
+    {"Skjermen nå", "Display status"},
+    {"Diagnostikk", "Diagnostics"},
+    {"2 minutter", "2 minutes"},
+    {"5 minutter", "5 minutes"},
+    {"Tidssone: ", "Time zone: "},
+    {"Nattmodus", "Night mode"},
+    {"Slukk fra", "Turn off at"},
+    {"Skjermlys", "Backlight"},
+    {"Lokal tid", "Local time"},
+    {"Tilkoblet", "Connected"},
+    {"Frakoblet", "Disconnected"},
+    {" minutter", " minutes"},
+    {"lang=\"nb\"", "lang=\"en\""},
+    {"På igjen", "Turn on at"},
+    {"1 minutt", "1 minute"},
+    {"Lagrer …", "Saving …"},
+    {"Oppetid", "Uptime"},
+    {"'På · '", "'On · '"},
+    {"' t '", "' h '"},
+    {"'Av'", "'Off'"},
+  };
+  for (const auto &pair : translations) {
+    size_t at = 0;
+    while ((at = page.find(pair[0], at)) != std::string::npos) {
+      page.replace(at, std::char_traits<char>::length(pair[0]), pair[1]);
+      at += std::char_traits<char>::length(pair[1]);
+    }
+  }
+  return page;
+}
+
 }

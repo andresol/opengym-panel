@@ -41,12 +41,20 @@ class InstallationTests(unittest.TestCase):
         self.assertIn('UPSTREAM="http://sessions:8894"', env)
         self.assertNotIn('token', text)
 
+    def test_english_language_is_explicit_and_matches_firmware_and_backend(self):
+        self.example['locale']['language'] = 'en'
+        config = m.validate(self.example)
+        text, env = m.render(config)
+        self.assertIn('panel_language: "en"', text)
+        self.assertIn('PANEL_LANGUAGE="en"', env)
+        self.assertEqual(config['substitutions']['panel_timezone'], m.DEFAULTS['panel_timezone'])
+
     def test_invalid_configuration_rejected_before_output(self):
         mutations = [lambda c:c.update(schema=True), lambda c:c.update(secret='x'),
                      lambda c:c['device'].update(name='bad name'),
                      lambda c:c['device'].update(friendly_name='bad\ntext'),
                      lambda c:c['locale'].update(timezone='Invalid/Timezone'),
-                     lambda c:c['locale'].update(language='en'),
+                     lambda c:c['locale'].update(language='fr'),
                      lambda c:c['network'].update(mode='auto'),
                      lambda c:c['network'].update(address='10.0.0.5'),
                      lambda c:c['services'].update(panel_url='http://user:pass@host'),

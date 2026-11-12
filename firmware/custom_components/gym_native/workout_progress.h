@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "ui_text.h"
 namespace esphome::gym_native {
 struct WorkoutProgress {
   unsigned work_done = 0, work_total = 0, warmup_done = 0, warmup_total = 0;
@@ -7,12 +8,14 @@ struct WorkoutProgress {
   unsigned next_ordinal = 0;
   bool next_warmup = false;
   bool complete() const { return next_row < 0 && work_total + warmup_total > 0; }
-  std::string next_caption() const {
-    if (complete()) return "Fullført";
+  std::string next_caption(const UiText &ui = {}) const {
+    if (complete()) return ui.tr("Fullført", "Complete");
     if (next_row < 0) return {};
-    return std::string(next_warmup ? "Oppv. " : "Sett ") + std::to_string(next_ordinal) +
-        " av " + std::to_string(next_warmup ? warmup_total : work_total) +
-        (next_side == 1 ? " · Venstre" : next_side == 2 ? " · Høyre" : "");
+    return std::string(next_warmup ? ui.tr("Oppv. ", "Warm-up ") : ui.tr("Sett ", "Set ")) +
+        std::to_string(next_ordinal) + ui.tr(" av ", " of ") +
+        std::to_string(next_warmup ? warmup_total : work_total) +
+        (next_side == 1 ? ui.tr(" · Venstre", " · Left") :
+         next_side == 2 ? ui.tr(" · Høyre", " · Right") : "");
   }
 };
 // A unilateral set counts as complete only after BOTH sides. An undone earlier
