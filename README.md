@@ -1,113 +1,89 @@
 # OpenGym Panel
 
-A self-hosted touchscreen companion for [OpenGym](https://github.com/DuarteSantos8/openGym).
-Plan your session, register completed sets and run a rest timer without handling a phone.
+A touchscreen for your self-hosted [OpenGym](https://github.com/DuarteSantos8/openGym)
+setup. Follow your routine, log sets and keep track of rest periods without
+picking up your phone.
 
-**Community source preview · 1.1.32-community.1.** The training workflow has been
-used on one installation. The generic installer and community firmware are new;
-an independent clean-install and physical touch test are still required before a
-stable community release. This is an independent companion, not an official
-OpenGym product.
+Built for the Guition JC8012P4A1 v3, with an ESP32-P4 and a 1280×800 display.
+This is an independent companion project.
+
+**Status:** Early community release (`1.1.32-community.1`). The training workflow
+is in use on one panel; the installer and community firmware still need testing
+on other setups.
 
 ## Screenshots
 
-**Native interface, rendered with example data.** These clean 1280×800 images
-use the panel's LVGL widget/render code and font, not a redesigned UI or AI artwork.
-They are desktop renders, not photographs or captured ESP32 framebuffers.
-
-<img src="docs/images/workout.png" alt="Native OpenGym workout interface with synthetic Alex profile and the original barbell squat illustration" width="960">
+<img src="docs/images/workout.png" alt="Workout view showing the exercise, set log and rest timer" width="960">
 
 <details>
 <summary>Profile selection</summary>
 
-<img src="docs/images/profiles.png" alt="Native profile selection with four fictional profiles" width="960">
+<img src="docs/images/profiles.png" alt="Profile selection screen" width="960">
 
 </details>
 
-The workout view demonstrates optional exercise media as displayed by a configured
-installation. The original exercise artwork has **separate third-party rights,
-not AGPL**. No standalone exercise asset is included. See the
-[render provenance and artwork notice](docs/images/RENDER-NOTICE.md).
-The generic installer still uses its neutral placeholder by default.
+*Desktop renders of the native LVGL interface, using example data.
+[Image notes](docs/images/RENDER-NOTICE.md).*
 
-## What it does
+## Features
 
-- One to eight separately bound profiles, with ordinary OpenGym device pairing.
-- Today's plan, routine selection on rest days and native OpenGym prescriptions.
-- Actual load/repetition/time entry, independent left/right results and explicit
-  set registration. Source routines are not changed by the set editor.
-- Confirmed-set progress, automatic rest, exercise navigation and a muscle map.
-- Explicit save/discard when finishing; retries do not duplicate workouts.
-- Per-profile drafts and retained screen state during short network outages.
-- Local brightness, sleep schedule and password-protected browser administration.
+- Up to eight profiles, each paired with its own OpenGym account.
+- Today's plan, with routine selection on rest days.
+- Weight, reps or duration entry, including separate left/right results.
+- Set progress, a muscle map and an adjustable rest timer.
+- Save or discard at the end of a session, with drafts kept through short
+  connection outages.
+- Brightness and sleep settings through a local, password-protected web page.
 
-The default illustration is original geometric artwork. **No standalone Gym visual
-assets are bundled, downloaded or extracted by the installer.** See
-[media and licences](docs/MEDIA.md) before enabling your own illustrations.
+Exercise illustrations are optional and aren't bundled. The default is a neutral
+placeholder; see [media setup and rights](docs/MEDIA.md) for your own images.
 
-## Supported setup
+## Requirements
 
-| Component | Supported baseline |
+| Component | Supported version |
 | --- | --- |
-| Display | Guition JC8012P4A1 **v3**, ESP32-P4, 1280×800 landscape |
-| Firmware | ESPHome **2026.10.0**, ESP-IDF **5.5.5**, local pinned drivers |
-| OpenGym | **1.4.4**, source `5f5832db56080837b58342ff50f78631dcc63e07` |
-| Companion host | Linux, Docker Engine + Compose, access to OpenGym data/API |
-| UI | Norwegian (`nb`); configurable IANA timezone |
+| Display | Guition JC8012P4A1 **v3**, ESP32-P4, 1280×800 |
+| OpenGym | Self-hosted **1.4.4** |
+| Companion host | Linux with Docker Engine and Compose |
+| Firmware | ESPHome **2026.10.0**, ESP-IDF **5.5.5** |
+| Interface language | Norwegian (`nb`) |
 
-Original/engineering-sample boards, similarly named v2 boards, arbitrary OpenGym
-versions and additional languages are not claimed compatible. The legacy files
-in `web/`, `preview/`, `firmware/opengym-panel.yaml` and `gym_panel/` are retained
-as source/test references, **not alternate supported installation targets**.
+The panel and companion host need to be on a trusted local network or VPN.
+Other boards and OpenGym versions haven't been verified. See the
+[hardware guide](docs/HARDWARE.md) before buying a display; similarly named v2
+boards are different hardware.
 
-## Quick start
+## Installation
 
-1. Read the [installation guide](docs/INSTALL.md) and [hardware notes](docs/HARDWARE.md).
-2. Make a private copy of `config/profiles.example.json` and bind your existing
-   non-administrator OpenGym profile(s).
-3. Run `python3 tools/setup.py --help` on the companion host. It generates unique
-   private keys and a Docker Compose installation; it never starts services,
-   changes OpenGym data, pairs a person or flashes hardware.
-4. Build/start the two companions, provision your Wi-Fi and compile your own
-   firmware. Pair each profile from the actual screen.
+The [installation guide](docs/INSTALL.md) covers the full setup. In brief:
 
-Do not use the old installation's firmware. No pre-provisioned binaries, account
-credentials, household configuration or private Git history are shipped here.
+1. Make a private copy of `config/profiles.example.json` for your OpenGym users.
+2. Generate the companion configuration with `tools/setup.py` on your Linux host.
+   Run `python3 tools/setup.py --help` for the available options.
+3. Start the companion services, configure Wi-Fi and
+   [build the firmware](docs/BUILDING.md) for your panel.
+4. Pair each profile from the screen using **Settings → Pair the mobile app**
+   in the corresponding OpenGym account.
 
-## Architecture
+## How it works
+
+Two small services connect the panel to OpenGym. They read workout plans from
+your server and save completed sessions through OpenGym's API.
 
 ```mermaid
 flowchart LR
-    Screen[ESP32 touchscreen] -->|LAN read/write keys| Native[Native adapter :8893]
-    Native -->|internal Docker network| Sessions[Session companion :8894]
-    Sessions -->|read-only mount| Data[OpenGym profile files]
-    Sessions -->|paired user token + revision check| API[Official OpenGym API]
+    Screen[ESP32 touchscreen] --> Native[Native adapter]
+    Native --> Sessions[Session companion]
+    Sessions -->|read-only| Data[OpenGym profile files]
+    Sessions -->|save workouts| API[OpenGym API]
 ```
 
-The session service never writes directly to OpenGym's mounted data. Completed
-workouts use the official API with revision checking, readback and bounded
-recovery copies. The service's own tokens and drafts have a separate private
-store. Neither Home Assistant nor OpenClaw is required.
-
-## Boundaries
-
-- Active phone workouts are not mirrored. Programme editing, drop/rest-pause
-  logging and per-set notes remain in OpenGym's app.
-- There is no offline write queue. A stale/disconnected screen cannot register
-  sets as if they had been accepted.
-- No calories, heart rate or bodyweight are fabricated by this display.
-- Apple Health is an optional **iPhone-app** integration, not a direct ESP32
-  upload. A saved panel workout can sync through the same OpenGym profile and
-  the native iPhone app; this complete path is not yet physically verified here.
-- No machine-specific cable weights are applied by default. An optional
-  explicit label table is documented in the installation guide.
-- This is a trusted-LAN/VPN service, not an internet-facing dashboard.
+Programme editing, drop/rest-pause logging and per-set notes stay in OpenGym.
+Active phone workouts aren't mirrored, and recording sets requires a connection
+to the server. Apple Health sync depends on OpenGym's iPhone app; the complete
+panel-to-Health path hasn't been verified.
 
 ## Development
-
-The community edition and the maintainer's installation share
-[one development workflow](docs/DEVELOPMENT.md). Source sync is separate from
-firmware deployment and never publishes private configuration or training data.
 
 ```sh
 npm ci --ignore-scripts
@@ -115,16 +91,13 @@ python3 -m pip install -r requirements-dev.txt
 python3 tools/check.py
 ```
 
-Firmware compile checking uses synthetic credentials and never uploads to a
-device. See [building and recovery](docs/BUILDING.md). Public CI and source
-packaging do not require any installation secrets.
+See [development](docs/DEVELOPMENT.md) for the source workflow and
+[building and recovery](docs/BUILDING.md) for firmware builds.
+Contributions are welcome; start with [CONTRIBUTING.md](CONTRIBUTING.md).
+For security issues, use the contact in [SECURITY.md](SECURITY.md).
 
 ## License
 
-Panel software: **AGPL-3.0-or-later**. Vendored OpenGym code retains its AGPL
-licence; drivers, font and muscle-map artwork retain their own notices. See
-[NOTICE.md](NOTICE.md), [LICENSE](LICENSE) and [upstream provenance](docs/UPSTREAM.md).
-
-Contributions are welcome; please read [CONTRIBUTING.md](CONTRIBUTING.md). Report
-security issues privately according to [SECURITY.md](SECURITY.md), without posting
-configuration files, tokens, profile IDs or training history.
+The panel software is **AGPL-3.0-or-later**. Third-party components and exercise
+artwork have their own terms; see [NOTICE.md](NOTICE.md), [LICENSE](LICENSE)
+and [upstream provenance](docs/UPSTREAM.md).

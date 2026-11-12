@@ -19,3 +19,7 @@ hash-approve each documentation image. Preserve separate rights notices for
 visible third-party artwork without claiming a screenshot exemption or shipping
 standalone reusable exercise assets. No real profiles, records, passwords,
 configuration or provisioning are authorized by this documentation request.
+
+Keep the README concise and outward-facing: practical project information,
+not a narration of assistant work or repeated AI/privacy disclaimers. Put detailed
+provenance, operational checks and caveats in the linked documentation.
