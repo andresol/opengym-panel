@@ -12,10 +12,12 @@ OpenGym product.
 ## Screenshots
 
 Native LVGL interface rendered on a desktop with **synthetic profiles and workout
-data**. These are not photographs or captured ESP32 framebuffers. The default
-original placeholder is shown; no restricted exercise artwork is included.
+data**. These are not photographs or captured ESP32 framebuffers. The workout
+example uses an original AI-generated squat illustration to demonstrate optional
+installer-supplied media. No Gym visual artwork is included. The adapter's
+runtime default remains the neutral placeholder until you configure your own media.
 
-![Workout view with synthetic set results, next-set highlighting and rest timer](docs/images/workout.png)
+![Workout view with an original barbell-squat illustration, synthetic set results and rest timer](docs/images/workout.png)
 
 <details>
 <summary>Profile selector</summary>

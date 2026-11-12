@@ -52,6 +52,21 @@ class DocumentationImageAuditTest(unittest.TestCase):
             path.write_bytes(self.png)
             self.assertTrue(audit.audit([path]))
 
+    def test_original_demo_artwork_has_one_explicit_approved_path(self):
+        name = "docs/images/barbell-squat-original.png"
+        content = (Path(__file__).parents[2] / name).read_bytes()
+        path = self.root / name
+        path.write_bytes(content)
+        manifest_path = self.root / "docs/images/manifest.json"
+        manifest = json.loads(manifest_path.read_text())
+        manifest["images"][name] = {"sha256": hashlib.sha256(content).hexdigest(),
+            "width": 1536, "height": 1024, "kind": "original-ai-exercise-illustration"}
+        manifest_path.write_text(json.dumps(manifest))
+        self.assertEqual(audit.audit([path]), [])
+        copied = path.with_name("unreviewed-artwork.png")
+        copied.write_bytes(content)
+        self.assertTrue(audit.audit([copied]))
+
 
 if __name__ == "__main__":
     unittest.main()

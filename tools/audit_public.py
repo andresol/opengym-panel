@@ -26,7 +26,14 @@ def approved_documentation_image(path, content):
     if not manifest.is_file():
         return False
     entry = json.loads(manifest.read_text()).get("images", {}).get(path.relative_to(ROOT).as_posix())
-    if not entry or path.suffix != ".png" or entry.get("kind") != "synthetic-native-lvgl-desktop-render":
+    if not entry or path.suffix != ".png":
+        return False
+    relative = path.relative_to(ROOT).as_posix()
+    if entry.get("kind") == "synthetic-native-lvgl-desktop-render":
+        expected_size = (1280, 800)
+    elif entry.get("kind") == "original-ai-exercise-illustration" and relative == "docs/images/barbell-squat-original.png":
+        expected_size = (1536, 1024)
+    else:
         return False
     if hashlib.sha256(content).hexdigest() != entry.get("sha256") or not content.startswith(b"\x89PNG\r\n\x1a\n"):
         return False
@@ -41,7 +48,7 @@ def approved_documentation_image(path, content):
             if size != 13:
                 return False
             width, height = struct.unpack(">II", content[offset + 8:offset + 16])
-            if (width, height) != (entry.get("width"), entry.get("height")) or (width, height) != (1280, 800):
+            if (width, height) != (entry.get("width"), entry.get("height")) or (width, height) != expected_size:
                 return False
         offset += 12 + size
         if kind == b"IEND":
