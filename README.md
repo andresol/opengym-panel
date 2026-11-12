@@ -9,6 +9,23 @@ an independent clean-install and physical touch test are still required before a
 stable community release. This is an independent companion, not an official
 OpenGym product.
 
+## Screenshots
+
+Native LVGL interface rendered on a desktop with **synthetic profiles and workout
+data**. These are not photographs or captured ESP32 framebuffers. The default
+original placeholder is shown; no restricted exercise artwork is included.
+
+![Workout view with synthetic set results, next-set highlighting and rest timer](docs/images/workout.png)
+
+<details>
+<summary>Profile selector</summary>
+
+![Profile selector with four fictional demonstration profiles](docs/images/profiles.png)
+
+</details>
+
+See [render provenance and reproduction](docs/DEVELOPMENT.md#readme-renders).
+
 ## What it does
 
 - One to eight separately bound profiles, with ordinary OpenGym device pairing.
@@ -83,6 +100,10 @@ store. Neither Home Assistant nor OpenClaw is required.
 - This is a trusted-LAN/VPN service, not an internet-facing dashboard.
 
 ## Development
+
+The community edition and the maintainer's installation share
+[one development workflow](docs/DEVELOPMENT.md). Source sync is separate from
+firmware deployment and never publishes private configuration or training data.
 
 ```sh
 npm ci --ignore-scripts

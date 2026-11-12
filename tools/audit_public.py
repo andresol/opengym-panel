@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Fail publication on common secret/private-data artifacts. Not a security audit."""
 from pathlib import Path
+import hashlib
+import json
 import re
+import struct
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,6 +20,35 @@ PATTERNS = [
 ]
 
 
+def approved_documentation_image(path, content):
+    """Only exact reviewed PNGs; no blanket exception for screenshots/media."""
+    manifest = ROOT / "docs/images/manifest.json"
+    if not manifest.is_file():
+        return False
+    entry = json.loads(manifest.read_text()).get("images", {}).get(path.relative_to(ROOT).as_posix())
+    if not entry or path.suffix != ".png" or entry.get("kind") != "synthetic-native-lvgl-desktop-render":
+        return False
+    if hashlib.sha256(content).hexdigest() != entry.get("sha256") or not content.startswith(b"\x89PNG\r\n\x1a\n"):
+        return False
+    offset, seen = 8, []
+    while offset + 12 <= len(content):
+        size = struct.unpack(">I", content[offset:offset + 4])[0]
+        kind = content[offset + 4:offset + 8]
+        if kind not in {b"IHDR", b"IDAT", b"IEND"} or offset + 12 + size > len(content):
+            return False  # No EXIF, comments, text chunks or trailing data.
+        seen.append(kind)
+        if kind == b"IHDR":
+            if size != 13:
+                return False
+            width, height = struct.unpack(">II", content[offset + 8:offset + 16])
+            if (width, height) != (entry.get("width"), entry.get("height")) or (width, height) != (1280, 800):
+                return False
+        offset += 12 + size
+        if kind == b"IEND":
+            break
+    return offset == len(content) and seen[0:1] == [b"IHDR"] and seen[-1:] == [b"IEND"] and b"IDAT" in seen
+
+
 def files():
     if (ROOT / ".git").exists():
         names = subprocess.check_output(["git", "ls-files", "-z"], cwd=ROOT).decode().split("\0")
@@ -29,6 +61,10 @@ def audit(paths):
     for path in paths:
         relative = path.relative_to(ROOT)
         name = relative.as_posix()
+        if not path.is_symlink() and name.startswith("docs/images/") and path.suffix == ".png":
+            if not approved_documentation_image(path, path.read_bytes()):
+                problems.append((name, "unapproved or metadata-bearing documentation image"))
+            continue
         if (path.is_symlink() or path.name in FORBIDDEN_NAMES or
                 path.suffix.lower() in FORBIDDEN_SUFFIXES or
                 re.fullmatch(r"state-[A-Za-z0-9_-]+\.json", path.name) or
