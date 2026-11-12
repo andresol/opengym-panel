@@ -1,0 +1,10 @@
+.git
+node_modules
+local
+dist
+artifacts
+**/secrets.yaml
+**/*.local.*
+**/.esphome
+**/__pycache__
+.venv

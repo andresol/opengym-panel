@@ -1,0 +1,50 @@
+name: Source and synthetic firmware checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg g++
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: python3 -m pip install -r requirements-dev.txt
+      - run: python3 tools/check.py
+      - run: python3 tools/package_public.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: community-source
+          path: dist/*
+
+  firmware:
+    needs: source
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile supported V3 target with synthetic credentials only
+        run: >-
+          docker run --rm
+          --entrypoint python3
+          -e ESPHOME_DEFAULT_COMPILE_PROCESS_LIMIT=2
+          -v "$PWD:/config" -w /config
+          ghcr.io/esphome/esphome:2026.10.0
+          tools/build_firmware.py --synthetic
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SYNTHETIC-NOT-FOR-INSTALL
+          path: dist/compile-check/*

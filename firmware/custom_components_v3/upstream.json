@@ -1,0 +1,27 @@
+{
+  "repository": "https://github.com/jtenniswood/espcontrol",
+  "release": "v2.13.0",
+  "commit": "9bf8567f1272b0b2bbe7788de95e8772620561bf",
+  "files": {
+    "mipi_dsi/LICENSE": "1f312390122725ee382f85af00e3df84f2490cd8fa61b9ea172bc6591cc0ac63",
+    "mipi_dsi/README.md": "c7d4d2bc56700030f036115dd3ed3b5518a375699adfa550b571d2a3528935e0",
+    "mipi_dsi/__init__.py": "d31a1b0d8e08981710a1ddc10f5b296132d1839801186262b8fc7c4782980296",
+    "mipi_dsi/display.py": "cc614c009ed6832f04d66191b8d06bac0789955eda08baded7999395c33a412d",
+    "mipi_dsi/mipi_dsi.cpp": "50781bf5aabf7bbf579deba45790a102f4584c898c785a717b45e15b4e696b8f",
+    "mipi_dsi/mipi_dsi.h": "4bb2a1d931457f6b2542a7d7933a94fa71e1cf4a5c7337b4e760253fb462f55b",
+    "mipi_dsi/models/__init__.py": "10e35f0f679fb9d18d5fbbde4e72f7a113f5112d65757b73b5df533dc2c9cc94",
+    "mipi_dsi/models/guition.py": "1dfe39859eb623ee987468b9927aa126b87ae50e849f177ede51cd582337951f",
+    "mipi_dsi/models/m5stack.py": "af3aed9a5b941b5f2e1017cc24589bf9096c6b7f904137f8b7ddc08a145d8d47",
+    "mipi_dsi/models/seeed.py": "7a304d318372c576227a91d7e06c4d5a98924334dae86e3586b21c4324ed24bf",
+    "mipi_dsi/models/waveshare.py": "95a531af535ef98468942351fd1ca226acbf9422cdb80baf77af15712bdb63bb",
+    "gsl3680/LICENSE.md": "1f312390122725ee382f85af00e3df84f2490cd8fa61b9ea172bc6591cc0ac63",
+    "gsl3680/README.md": "0ce98f50f1405e7024a211c5b675199183fa24d5728b6c6d1e70e528cf55f92b",
+    "gsl3680/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gsl3680/gsl3680.cpp": "e1707a423bcba47ad44b8d24b0840799d923429ece55cf8298f8f81a9c34527c",
+    "gsl3680/gsl3680.h": "9f7426879fb58e679b42cb4c40b7b23e6ef4abdd17fc9b2f92624df4a41f2774",
+    "gsl3680/gsl3680_firmware.h": "558e2a9f74449663c1fc9a1d6f3f48d66b1a0a41a40b1cef943efaf9bcb5bf08",
+    "gsl3680/gsl_point_id.cpp": "c62bf2f41bc64233fb88688e92d00e26dc3278bfde4bf2932959e140df14cc47",
+    "gsl3680/gsl_point_id.h": "94e81e2e23c3ab22a9e0f8581479b0fea1f47316ca5ded9a7a59dec9f4f8d4bb",
+    "gsl3680/touchscreen.py": "cbdf7562a0c73c1fb169b42d43a7eb37dec93c696fd45f8e237b3e20c719ce1d"
+  }
+}

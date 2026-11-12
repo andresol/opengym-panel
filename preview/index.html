@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="nb"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>OpenGym · Ny panelvisning</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+<main id="app">
+ <header class="topbar">
+  <a class="brand" href="/" aria-label="OpenGym – velg person">OpenGym<span class="brand-dot"></span></a>
+  <div class="header-actions"><button id="connection" class="mode-button">Demo</button><button id="person" class="person-button" aria-haspopup="dialog"><span class="avatar" id="avatar">+</span><span id="person-name">Velg person</span><span aria-hidden="true">⌄</span></button></div>
+ </header>
+ <section id="welcome" class="welcome">
+  <div class="welcome-heading"><p class="eyebrow">DITT TEMPO. DIN ØKT.</p><h1>Hvem trener i dag?</h1><p class="muted">Velg din treningsplan.</p></div>
+  <div id="profiles" class="profile-grid" aria-label="Personer"></div>
+  <p class="welcome-caption">Forhåndsvisning · eksempeldata · ingen treningslogging</p>
+ </section>
+ <section id="workout" hidden>
+  <div class="planbar"><div class="plan-heading"><p class="eyebrow" id="plan-owner"></p><h1 id="routine"></h1></div><nav id="week" aria-label="Ukedager"></nav></div>
+  <div class="workspace">
+   <aside class="exercise-sidebar"><div class="section-title"><h2>Øvelser</h2><span id="exercise-count"></span></div><nav id="exercise-list" aria-label="Øvelser i økten"></nav><p id="list-footer" class="muted"></p></aside>
+   <section class="exercise-stage" aria-label="Valgt øvelse">
+    <div class="exercise-heading"><p class="eyebrow" id="position"></p><h2 id="exercise"></h2></div>
+    <div class="media-stage"><img id="exercise-image" alt="" hidden><div id="media-empty"><span class="empty-icon" aria-hidden="true">―</span><span id="media-message">Velg en øvelse</span></div><button id="animate" class="media-toggle" hidden>Spill animasjon</button></div>
+    <p id="note" class="exercise-note"></p>
+    <div class="exercise-navigation"><button id="prev" class="secondary">← Forrige</button><button id="next" class="secondary">Neste øvelse →</button></div>
+   </section>
+   <section class="prescription" aria-label="Sett og pause">
+    <div class="sets-heading"><p class="eyebrow">PLANLAGTE SETT</p><strong id="set-count">—</strong></div>
+    <div class="metrics"><div><p class="eyebrow" id="load-label">BELASTNING</p><strong id="load">—</strong></div><div><p class="eyebrow" id="target-label">REPETISJONER</p><strong id="target">—</strong></div></div>
+    <p id="detail" class="detail"></p>
+    <div id="sets" class="set-rows" aria-label="Alle planlagte sett"></div>
+    <div class="rest-controls"><div class="rest-heading"><span class="eyebrow">PAUSE</span><output id="timer" aria-live="off">00:00</output></div><div class="timer-adjust"><button id="minus" class="secondary" aria-label="15 sekunder kortere pause">−15 s</button><button id="timer-reset" class="secondary">Nullstill</button><button id="plus" class="secondary" aria-label="15 sekunder lengre pause">+15 s</button></div><button id="timer-start" class="primary">Start pause</button></div>
+   </section>
+  </div>
+ </section>
+ <footer><span id="status" role="status">Forhåndsvisning · eksempeldata · ingen treningslogging</span><a href="http://192.0.2.142:8888" target="_blank" rel="noreferrer">Åpne OpenGym ↗</a></footer>
+</main>
+<dialog id="profile-dialog"><div class="dialog-top"><h2>Velg person</h2><button id="profile-close" class="icon-button" aria-label="Lukk personvalg">✕</button></div><div id="profile-options" class="profile-grid compact"></div></dialog>
+<dialog id="connect-dialog"><form id="connect-form"><div class="dialog-top"><h2>Live treningsplan</h2><button id="cancel" type="button" class="icon-button" aria-label="Lukk tilkobling">✕</button></div><label>Panelnøkkel<input id="token" type="password" autocomplete="off" required minlength="32"></label><p id="connect-error" role="alert"></p><button type="submit" class="primary">Koble til</button><button id="demo-mode" type="button" class="secondary">Bruk eksempeldata</button></form></dialog>
+<script type="module" src="/app.js"></script>
+</body></html>

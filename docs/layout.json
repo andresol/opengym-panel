@@ -1,0 +1,223 @@
+{
+  "width": 1280,
+  "height": 800,
+  "rotation": 90,
+  "widgets": [
+    {
+      "id": "brand",
+      "x": 32,
+      "y": 32,
+      "w": 300,
+      "h": 50,
+      "kind": "label"
+    },
+    {
+      "id": "date",
+      "x": 850,
+      "y": 40,
+      "w": 398,
+      "h": 42,
+      "kind": "label"
+    },
+    {
+      "id": "day0",
+      "x": 32,
+      "y": 110,
+      "w": 160,
+      "h": 64,
+      "kind": "button"
+    },
+    {
+      "id": "day1",
+      "x": 208,
+      "y": 110,
+      "w": 160,
+      "h": 64,
+      "kind": "button"
+    },
+    {
+      "id": "day2",
+      "x": 384,
+      "y": 110,
+      "w": 160,
+      "h": 64,
+      "kind": "button"
+    },
+    {
+      "id": "day3",
+      "x": 560,
+      "y": 110,
+      "w": 160,
+      "h": 64,
+      "kind": "button"
+    },
+    {
+      "id": "day4",
+      "x": 736,
+      "y": 110,
+      "w": 160,
+      "h": 64,
+      "kind": "button"
+    },
+    {
+      "id": "day5",
+      "x": 912,
+      "y": 110,
+      "w": 160,
+      "h": 64,
+      "kind": "button"
+    },
+    {
+      "id": "day6",
+      "x": 1088,
+      "y": 110,
+      "w": 160,
+      "h": 64,
+      "kind": "button"
+    },
+    {
+      "id": "eyebrow",
+      "x": 32,
+      "y": 206,
+      "w": 1216,
+      "h": 28,
+      "kind": "label"
+    },
+    {
+      "id": "routine",
+      "x": 32,
+      "y": 235,
+      "w": 1216,
+      "h": 84,
+      "kind": "label"
+    },
+    {
+      "id": "position",
+      "x": 32,
+      "y": 325,
+      "w": 845,
+      "h": 34,
+      "kind": "label"
+    },
+    {
+      "id": "exercise",
+      "x": 32,
+      "y": 370,
+      "w": 830,
+      "h": 104,
+      "kind": "label"
+    },
+    {
+      "id": "target",
+      "x": 32,
+      "y": 485,
+      "w": 300,
+      "h": 85,
+      "kind": "label"
+    },
+    {
+      "id": "load",
+      "x": 345,
+      "y": 510,
+      "w": 505,
+      "h": 58,
+      "kind": "label"
+    },
+    {
+      "id": "detail_label",
+      "x": 32,
+      "y": 575,
+      "w": 845,
+      "h": 32,
+      "kind": "label"
+    },
+    {
+      "id": "note",
+      "x": 32,
+      "y": 609,
+      "w": 845,
+      "h": 43,
+      "kind": "label"
+    },
+    {
+      "id": "timer_heading",
+      "x": 920,
+      "y": 340,
+      "w": 328,
+      "h": 34,
+      "kind": "label"
+    },
+    {
+      "id": "timer",
+      "x": 900,
+      "y": 386,
+      "w": 368,
+      "h": 98,
+      "kind": "label"
+    },
+    {
+      "id": "minus",
+      "x": 920,
+      "y": 500,
+      "w": 156,
+      "h": 60,
+      "kind": "button"
+    },
+    {
+      "id": "plus",
+      "x": 1092,
+      "y": 500,
+      "w": 156,
+      "h": 60,
+      "kind": "button"
+    },
+    {
+      "id": "timer_start",
+      "x": 920,
+      "y": 578,
+      "w": 328,
+      "h": 74,
+      "kind": "button"
+    },
+    {
+      "id": "timer_reset",
+      "x": 920,
+      "y": 672,
+      "w": 328,
+      "h": 70,
+      "kind": "button"
+    },
+    {
+      "id": "prev",
+      "x": 32,
+      "y": 672,
+      "w": 180,
+      "h": 70,
+      "kind": "button"
+    },
+    {
+      "id": "next",
+      "x": 228,
+      "y": 672,
+      "w": 180,
+      "h": 70,
+      "kind": "button"
+    },
+    {
+      "id": "status",
+      "x": 32,
+      "y": 764,
+      "w": 860,
+      "h": 28,
+      "kind": "label"
+    },
+    {
+      "id": "log_hint",
+      "x": 920,
+      "y": 764,
+      "w": 328,
+      "h": 28,
+      "kind": "label"
+    }
+  ]
+}

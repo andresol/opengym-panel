@@ -1,0 +1,12 @@
+{
+  "substitutions": {
+    "panel_name": "opengym-panel",
+    "panel_friendly_name": "OpenGym treningsskjerm",
+    "panel_timezone": "Europe/Oslo",
+    "panel_language": "nb",
+    "panel_static_ip": "192.0.2.12",
+    "panel_gateway": "192.0.2.1",
+    "panel_subnet": "255.255.255.0",
+    "panel_dns": "192.0.2.1"
+  }
+}

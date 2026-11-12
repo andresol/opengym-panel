@@ -1,0 +1,728 @@
+{
+  "font": [
+    {
+      "file": "fonts/DejaVuSans.ttf",
+      "id": "f20",
+      "size": 20,
+      "bpp": 4,
+      "glyphsets": [
+        "GF_Latin_Core"
+      ],
+      "glyphs": [
+        "‹",
+        "›",
+        "−",
+        "…",
+        "×",
+        "·"
+      ]
+    },
+    {
+      "file": "fonts/DejaVuSans.ttf",
+      "id": "f26",
+      "size": 26,
+      "bpp": 4,
+      "glyphsets": [
+        "GF_Latin_Core"
+      ],
+      "glyphs": [
+        "‹",
+        "›",
+        "−",
+        "…",
+        "×",
+        "·"
+      ]
+    },
+    {
+      "file": "fonts/DejaVuSans.ttf",
+      "id": "f32",
+      "size": 32,
+      "bpp": 4,
+      "glyphsets": [
+        "GF_Latin_Core"
+      ],
+      "glyphs": [
+        "‹",
+        "›",
+        "−",
+        "…",
+        "×",
+        "·"
+      ]
+    },
+    {
+      "file": "fonts/DejaVuSans.ttf",
+      "id": "f36",
+      "size": 36,
+      "bpp": 4,
+      "glyphsets": [
+        "GF_Latin_Core"
+      ],
+      "glyphs": [
+        "‹",
+        "›",
+        "−",
+        "…",
+        "×",
+        "·"
+      ]
+    },
+    {
+      "file": "fonts/DejaVuSans.ttf",
+      "id": "f38",
+      "size": 38,
+      "bpp": 4,
+      "glyphsets": [
+        "GF_Latin_Core"
+      ],
+      "glyphs": [
+        "‹",
+        "›",
+        "−",
+        "…",
+        "×",
+        "·"
+      ]
+    },
+    {
+      "file": "fonts/DejaVuSans.ttf",
+      "id": "f66",
+      "size": 66,
+      "bpp": 4,
+      "glyphsets": [
+        "GF_Latin_Core"
+      ],
+      "glyphs": [
+        "‹",
+        "›",
+        "−",
+        "…",
+        "×",
+        "·"
+      ]
+    },
+    {
+      "file": "fonts/DejaVuSans.ttf",
+      "id": "f76",
+      "size": 76,
+      "bpp": 4,
+      "glyphsets": [
+        "GF_Latin_Core"
+      ],
+      "glyphs": [
+        "‹",
+        "›",
+        "−",
+        "…",
+        "×",
+        "·"
+      ]
+    }
+  ],
+  "lvgl": {
+    "id": "gym_ui",
+    "displays": [
+      "panel_display"
+    ],
+    "touchscreens": [
+      {
+        "touchscreen_id": "panel_touch"
+      }
+    ],
+    "rotation": 90,
+    "color_depth": 16,
+    "buffer_size": "100%",
+    "byte_order": "little_endian",
+    "text_font": "f26",
+    "bg_color": "0x101927",
+    "text_color": "0xF1F5F9",
+    "pages": [
+      {
+        "id": "main_page",
+        "bg_color": "0x101927",
+        "pad_all": 0,
+        "scrollable": false,
+        "widgets": [
+          {
+            "label": {
+              "id": "brand",
+              "text": "OpenGym",
+              "x": 32,
+              "y": 32,
+              "width": 300,
+              "height": 50,
+              "text_font": "f36",
+              "text_color": "0x78E0B0",
+              "long_mode": "DOT"
+            }
+          },
+          {
+            "label": {
+              "id": "date",
+              "text": "",
+              "x": 850,
+              "y": 40,
+              "width": 398,
+              "height": 42,
+              "text_font": "f26",
+              "text_color": "0xF1F5F9",
+              "long_mode": "DOT",
+              "text_align": "RIGHT"
+            }
+          },
+          {
+            "button": {
+              "id": "day0",
+              "x": 32,
+              "y": 110,
+              "width": 160,
+              "height": 64,
+              "bg_color": "0x24344B",
+              "text_color": "0xF1F5F9",
+              "radius": 16,
+              "border_width": 0,
+              "shadow_width": 0,
+              "outline_width": 0,
+              "pad_all": 0,
+              "on_click": [
+                {
+                  "lambda": "id(gym).select_day(0);"
+                }
+              ],
+              "widgets": [
+                {
+                  "label": {
+                    "text": "Man",
+                    "align": "CENTER",
+                    "text_font": "f26"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "button": {
+              "id": "day1",
+              "x": 208,
+              "y": 110,
+              "width": 160,
+              "height": 64,
+              "bg_color": "0x24344B",
+              "text_color": "0xF1F5F9",
+              "radius": 16,
+              "border_width": 0,
+              "shadow_width": 0,
+              "outline_width": 0,
+              "pad_all": 0,
+              "on_click": [
+                {
+                  "lambda": "id(gym).select_day(1);"
+                }
+              ],
+              "widgets": [
+                {
+                  "label": {
+                    "text": "Tir",
+                    "align": "CENTER",
+                    "text_font": "f26"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "button": {
+              "id": "day2",
+              "x": 384,
+              "y": 110,
+              "width": 160,
+              "height": 64,
+              "bg_color": "0x24344B",
+              "text_color": "0xF1F5F9",
+              "radius": 16,
+              "border_width": 0,
+              "shadow_width": 0,
+              "outline_width": 0,
+              "pad_all": 0,
+              "on_click": [
+                {
+                  "lambda": "id(gym).select_day(2);"
+                }
+              ],
+              "widgets": [
+                {
+                  "label": {
+                    "text": "Ons",
+                    "align": "CENTER",
+                    "text_font": "f26"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "button": {
+              "id": "day3",
+              "x": 560,
+              "y": 110,
+              "width": 160,
+              "height": 64,
+              "bg_color": "0x24344B",
+              "text_color": "0xF1F5F9",
+              "radius": 16,
+              "border_width": 0,
+              "shadow_width": 0,
+              "outline_width": 0,
+              "pad_all": 0,
+              "on_click": [
+                {
+                  "lambda": "id(gym).select_day(3);"
+                }
+              ],
+              "widgets": [
+                {
+                  "label": {
+                    "text": "Tor",
+                    "align": "CENTER",
+                    "text_font": "f26"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "button": {
+              "id": "day4",
+              "x": 736,
+              "y": 110,
+              "width": 160,
+              "height": 64,
+              "bg_color": "0x24344B",
+              "text_color": "0xF1F5F9",
+              "radius": 16,
+              "border_width": 0,
+              "shadow_width": 0,
+              "outline_width": 0,
+              "pad_all": 0,
+              "on_click": [
+                {
+                  "lambda": "id(gym).select_day(4);"
+                }
+              ],
+              "widgets": [
+                {
+                  "label": {
+                    "text": "Fre",
+                    "align": "CENTER",
+                    "text_font": "f26"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "button": {
+              "id": "day5",
+              "x": 912,
+              "y": 110,
+              "width": 160,
+              "height": 64,
+              "bg_color": "0x24344B",
+              "text_color": "0xF1F5F9",
+              "radius": 16,
+              "border_width": 0,
+              "shadow_width": 0,
+              "outline_width": 0,
+              "pad_all": 0,
+              "on_click": [
+                {
+                  "lambda": "id(gym).select_day(5);"
+                }
+              ],
+              "widgets": [
+                {
+                  "label": {
+                    "text": "Lør",
+                    "align": "CENTER",
+                    "text_font": "f26"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "button": {
+              "id": "day6",
+              "x": 1088,
+              "y": 110,
+              "width": 160,
+              "height": 64,
+              "bg_color": "0x24344B",
+              "text_color": "0xF1F5F9",
+              "radius": 16,
+              "border_width": 0,
+              "shadow_width": 0,
+              "outline_width": 0,
+              "pad_all": 0,
+              "on_click": [
+                {
+                  "lambda": "id(gym).select_day(6);"
+                }
+              ],
+              "widgets": [
+                {
+                  "label": {
+                    "text": "Søn",
+                    "align": "CENTER",
+                    "text_font": "f26"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "label": {
+              "id": "eyebrow",
+              "text": "ANDRE · UKEPLAN",
+              "x": 32,
+              "y": 206,
+              "width": 1216,
+              "height": 28,
+              "text_font": "f20",
+              "text_color": "0x9BAFC8",
+              "long_mode": "DOT"
+            }
+          },
+          {
+            "label": {
+              "id": "routine",
+              "text": "Kobler til OpenGym …",
+              "x": 32,
+              "y": 235,
+              "width": 1216,
+              "height": 84,
+              "text_font": "f36",
+              "text_color": "0xF1F5F9",
+              "long_mode": "DOT"
+            }
+          },
+          {
+            "label": {
+              "id": "position",
+              "text": "",
+              "x": 32,
+              "y": 325,
+              "width": 845,
+              "height": 34,
+              "text_font": "f26",
+              "text_color": "0x78E0B0",
+              "long_mode": "DOT"
+            }
+          },
+          {
+            "label": {
+              "id": "exercise",
+              "text": "",
+              "x": 32,
+              "y": 370,
+              "width": 830,
+              "height": 104,
+              "text_font": "f38",
+              "text_color": "0xF1F5F9",
+              "long_mode": "DOT"
+            }
+          },
+          {
+            "label": {
+              "id": "target",
+              "text": "",
+              "x": 32,
+              "y": 485,
+              "width": 300,
+              "height": 85,
+              "text_font": "f66",
+              "text_color": "0xF1F5F9",
+              "long_mode": "DOT"
+            }
+          },
+          {
+            "label": {
+              "id": "load",
+              "text": "",
+              "x": 345,
+              "y": 510,
+              "width": 505,
+              "height": 58,
+              "text_font": "f32",
+              "text_color": "0xD6E4F5",
+              "long_mode": "DOT"
+            }
+          },
+          {
+            "label": {
+              "id": "detail_label",
+              "text": "",
+              "x": 32,
+              "y": 575,
+              "width": 845,
+              "height": 32,
+              "text_font": "f20",
+              "text_color": "0xB2C2D7",
+              "long_mode": "DOT"
+            }
+          },
+          {
+            "label": {
+              "id": "note",
+              "text": "",
+              "x": 32,
+              "y": 609,
+              "width": 845,
+              "height": 43,
+              "text_font": "f20",
+              "text_color": "0xB2C2D7",
+              "long_mode": "DOT"
+            }
+          },
+          {
+            "label": {
+              "id": "timer_heading",
+              "text": "PAUSE",
+              "x": 920,
+              "y": 340,
+              "width": 328,
+              "height": 34,
+              "text_font": "f20",
+              "text_color": "0x9BAFC8",
+              "long_mode": "DOT",
+              "text_align": "CENTER"
+            }
+          },
+          {
+            "label": {
+              "id": "timer",
+              "text": "00:00",
+              "x": 900,
+              "y": 386,
+              "width": 368,
+              "height": 98,
+              "text_font": "f76",
+              "text_color": "0xF1F5F9",
+              "long_mode": "DOT",
+              "text_align": "CENTER"
+            }
+          },
+          {
+            "button": {
+              "id": "minus",
+              "x": 920,
+              "y": 500,
+              "width": 156,
+              "height": 60,
+              "bg_color": "0x24344B",
+              "text_color": "0xF1F5F9",
+              "radius": 16,
+              "border_width": 0,
+              "shadow_width": 0,
+              "outline_width": 0,
+              "pad_all": 0,
+              "on_click": [
+                {
+                  "lambda": "id(gym).timer_adjust(-15);"
+                }
+              ],
+              "widgets": [
+                {
+                  "label": {
+                    "text": "−15 s",
+                    "align": "CENTER",
+                    "text_font": "f26"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "button": {
+              "id": "plus",
+              "x": 1092,
+              "y": 500,
+              "width": 156,
+              "height": 60,
+              "bg_color": "0x24344B",
+              "text_color": "0xF1F5F9",
+              "radius": 16,
+              "border_width": 0,
+              "shadow_width": 0,
+              "outline_width": 0,
+              "pad_all": 0,
+              "on_click": [
+                {
+                  "lambda": "id(gym).timer_adjust(15);"
+                }
+              ],
+              "widgets": [
+                {
+                  "label": {
+                    "text": "+15 s",
+                    "align": "CENTER",
+                    "text_font": "f26"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "button": {
+              "id": "timer_start",
+              "x": 920,
+              "y": 578,
+              "width": 328,
+              "height": 74,
+              "bg_color": "0x78E0B0",
+              "text_color": "0x10241D",
+              "radius": 16,
+              "border_width": 0,
+              "shadow_width": 0,
+              "outline_width": 0,
+              "pad_all": 0,
+              "on_click": [
+                {
+                  "lambda": "id(gym).timer_toggle();"
+                }
+              ],
+              "widgets": [
+                {
+                  "label": {
+                    "text": "Start pause",
+                    "align": "CENTER",
+                    "text_font": "f26",
+                    "id": "timer_action"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "button": {
+              "id": "timer_reset",
+              "x": 920,
+              "y": 672,
+              "width": 328,
+              "height": 70,
+              "bg_color": "0x24344B",
+              "text_color": "0xF1F5F9",
+              "radius": 16,
+              "border_width": 0,
+              "shadow_width": 0,
+              "outline_width": 0,
+              "pad_all": 0,
+              "on_click": [
+                {
+                  "lambda": "id(gym).timer_reset();"
+                }
+              ],
+              "widgets": [
+                {
+                  "label": {
+                    "text": "Nullstill",
+                    "align": "CENTER",
+                    "text_font": "f26"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "button": {
+              "id": "prev",
+              "x": 32,
+              "y": 672,
+              "width": 180,
+              "height": 70,
+              "bg_color": "0x24344B",
+              "text_color": "0xF1F5F9",
+              "radius": 16,
+              "border_width": 0,
+              "shadow_width": 0,
+              "outline_width": 0,
+              "pad_all": 0,
+              "on_click": [
+                {
+                  "lambda": "id(gym).navigate(-1);"
+                }
+              ],
+              "widgets": [
+                {
+                  "label": {
+                    "text": "‹ Forrige",
+                    "align": "CENTER",
+                    "text_font": "f26"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "button": {
+              "id": "next",
+              "x": 228,
+              "y": 672,
+              "width": 180,
+              "height": 70,
+              "bg_color": "0x24344B",
+              "text_color": "0xF1F5F9",
+              "radius": 16,
+              "border_width": 0,
+              "shadow_width": 0,
+              "outline_width": 0,
+              "pad_all": 0,
+              "on_click": [
+                {
+                  "lambda": "id(gym).navigate(1);"
+                }
+              ],
+              "widgets": [
+                {
+                  "label": {
+                    "text": "Neste ›",
+                    "align": "CENTER",
+                    "text_font": "f26"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "label": {
+              "id": "status",
+              "text": "Kobler til …",
+              "x": 32,
+              "y": 764,
+              "width": 860,
+              "height": 28,
+              "text_font": "f20",
+              "text_color": "0x9BAFC8",
+              "long_mode": "DOT"
+            }
+          },
+          {
+            "label": {
+              "id": "log_hint",
+              "text": "Logging i OpenGym",
+              "x": 920,
+              "y": 764,
+              "width": 328,
+              "height": 28,
+              "text_font": "f20",
+              "text_color": "0x9BAFC8",
+              "long_mode": "DOT",
+              "text_align": "RIGHT"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

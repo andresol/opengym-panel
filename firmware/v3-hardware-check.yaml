@@ -1,0 +1,44 @@
+# COMPILE-ONLY diagnostic. Deliberately invalid provisioning: DO NOT INSTALL.
+# Does not implement the selected port-8892 training interface.
+esphome:
+  name: opengym-v3-hardware-check
+  friendly_name: OpenGym V3 hardware check - NOT FOR INSTALL
+  min_version: 2026.9.0
+  compile_process_limit: 2
+  project:
+    name: sollie.opengym-v3-hardware-check
+    version: 0.0.1-hwcheck
+
+packages:
+  hardware: !include hardware/jc8012p4a1-v3.yaml
+
+# A future approved hardware test would show ESPHome's colour test card;
+# it would not display private plans or operate any Home Assistant equipment.
+display:
+  - id: !extend panel_display
+    update_interval: 1s
+    show_test_card: true
+
+logger:
+  level: DEBUG
+
+wifi:
+  ssid: BUILD_ONLY_DO_NOT_INSTALL
+  password: BUILD_ONLY_DO_NOT_INSTALL
+  reboot_timeout: 0s
+  power_save_mode: none
+
+api:
+  encryption:
+    # Public test key, not a deployment credential.
+    key: AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=
+  reboot_timeout: 0s
+
+ota:
+  - platform: esphome
+    password: BUILD_ONLY_DO_NOT_INSTALL
+
+sensor:
+  - platform: uptime
+    name: Oppetid
+    update_interval: 10s

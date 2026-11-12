@@ -1,0 +1,15 @@
+<!doctype html><html lang="nb"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>OpenGym · Treningspanel</title><link rel="stylesheet" href="/style.css"></head><body>
+<main id="panel" aria-label="OpenGym treningspanel">
+<header><strong>Open<span>Gym</span></strong><span id="date"></span><button id="connection">DEMO</button></header>
+<nav id="week" aria-label="Ukedager"></nav>
+<div id="eyebrow">ANDRE · UKEPLAN</div><h1 id="routine">Laster …</h1>
+<div id="position"></div><h2 id="exercise"></h2>
+<div id="target"></div><div id="load"></div><div id="detail"></div><p id="note"></p>
+<div id="timer-label">PAUSE</div><output id="timer">00:00</output>
+<button id="minus" aria-label="15 sekunder kortere pause">−15 s</button><button id="plus" aria-label="15 sekunder lengre pause">+15 s</button>
+<button id="timer-start">Start pause</button><button id="timer-reset">Nullstill</button>
+<button id="prev">‹ Forrige</button><button id="next">Neste ›</button>
+<div id="status" role="status">Forhåndsvisning · eksempeldata</div><a id="opengym" href="http://192.0.2.142:8888" target="_blank" rel="noreferrer">Logg i OpenGym ↗</a>
+</main>
+<dialog id="connect-dialog"><form id="connect-form"><h2>Koble til OpenGym</h2><label>Panelnøkkel<input id="token" type="password" autocomplete="off" required minlength="32"></label><p id="connect-error" role="status"></p><div><button id="cancel" type="button">Avbryt</button><button type="submit">Koble til</button></div></form></dialog>
+<script type="module" src="/app.js"></script></body></html>

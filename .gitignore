@@ -1,0 +1,17 @@
+node_modules/
+.venv/
+**/__pycache__/
+*.pyc
+**/.esphome/
+.ci-build/
+.ci-cache/
+.ci-tests/
+dist/
+artifacts/
+local/
+.env
+.env.*
+!.env.example
+**/secrets.yaml
+firmware/*.local.*
+config.json

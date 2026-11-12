@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "device": {
+    "name": "gym-panel",
+    "friendly_name": "Treningsskjerm"
+  },
+  "locale": {
+    "timezone": "Europe/Oslo",
+    "language": "nb"
+  },
+  "network": {
+    "mode": "dhcp"
+  },
+  "services": {
+    "panel_url": "http://gym-server.local:8893",
+    "session_upstream": "http://sessions:8894",
+    "opengym_api": "http://opengym:8888"
+  }
+}
