@@ -50,7 +50,7 @@ std::string media_route(const std::string &source, bool animation) {
     if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
           (c >= '0' && c <= '9') || c == '_' || c == '-' || c == '.')) return {};
   }
-  return std::string("/packed/") + (animation ? "animation/" : "still/") + file;
+  return std::string(animation ? "/packed-hq/animation/" : "/packed/still/") + file;
 }
 }  // namespace
 
@@ -756,7 +756,7 @@ bool GymNative::accept_media(SharedMedia body, const std::string &route) {
   };
   const auto w = word(4), h = word(6), frames = word(8), delay = word(10);
   if ((!playing_ && (w != 512 || h != 360 || frames != 1)) ||
-      (playing_ && (w != 320 || h != 224 || frames < 1 || frames > 24 || delay < 100 || delay > 20000)) ||
+      (playing_ && (w != 512 || h != 360 || frames < 1 || frames > 24 || delay < 100 || delay > 20000)) ||
       body->size() != 12 + static_cast<size_t>(w) * h * frames * 2) return false;
   hide_media();
   media_bytes_ = std::move(body);
@@ -771,9 +771,9 @@ bool GymNative::accept_media(SharedMedia body, const std::string &route) {
   image_descriptor_.header.stride = w * 2;
   image_descriptor_.data_size = w * h * 2;
   show_frame(0);
-  // 410/256 maps 320 px to 512.5 px. The fixed 512×360 viewport clips only
-  // the subpixel white edge and fills the <2 px vertical white remainder.
-  lv_image_set_scale(media_image_, playing_ ? 410 : 256);
+  // Both modes arrive at display resolution with identical canvas/margins.
+  // Never enlarge a smaller animation or change the touch/layout geometry.
+  lv_image_set_scale(media_image_, 256);
   lv_obj_center(media_image_);
   hidden(media_empty_, true); hidden(media_viewport_, false); hidden(media_image_, false);
   const int rendered_width = 512, rendered_height = 360;

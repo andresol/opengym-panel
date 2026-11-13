@@ -47,6 +47,22 @@ class ModernMediaTests(unittest.TestCase):
                 self.assertLessEqual(call.kwargs['timeout'], 20)
                 self.assertNotIn('shell', call.kwargs)
 
+    def test_hq_video_matches_still_canvas_and_retains_frame_count(self):
+        with tempfile.TemporaryDirectory() as directory:
+            video = Path(directory) / '1202.mp4'
+            video.write_bytes(b'fixture')
+            probe = {'streams': [{'width': 360, 'height': 640}], 'format': {'duration': '3.6'}}
+            frames = bytes([255, 0, 0]) * (512 * 360 * 24)
+            responses = [subprocess.CompletedProcess([], 0, json.dumps(probe).encode()),
+                         subprocess.CompletedProcess([], 0, frames)]
+            with patch.object(module.subprocess, 'run', side_effect=responses) as run:
+                output = module.convert_video(video, high_quality=True)
+            self.assertEqual(struct.unpack('<4sHHHH', output[:12]), (b'GYM1', 512, 360, 24, 150))
+            command = run.call_args_list[1].args[0]
+            spatial_filter = command[command.index('-vf') + 1]
+            self.assertIn('scale=194:344:flags=lanczos,pad=512:360:159:8:color=white', spatial_filter)
+            self.assertEqual(output[12:14], b'\x00\xf8')
+
     def test_invalid_duration_output_and_symlink_are_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             video = Path(directory) / 'video.mp4'

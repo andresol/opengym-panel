@@ -22,7 +22,7 @@ import urllib.request
 
 from PIL import Image, ImageOps, ImageChops, ImageDraw
 
-VERSION = "1.2.1"
+VERSION = "1.2.2"
 ROOT = Path(__file__).resolve().parent
 Image.MAX_IMAGE_PIXELS = 8_000_000
 MEDIA_LIMIT = 6 * 1024 * 1024
@@ -44,7 +44,7 @@ def read_regular(path, limit):
 
 def rgb565(image, width, height):
     canvas = Image.new("RGB", (width, height), "white")
-    sample = ImageOps.contain(image.convert("RGB"), (width - 16, height - 16))
+    sample = ImageOps.contain(image.convert("RGB"), (width - 16, height - 16), Image.Resampling.LANCZOS)
     canvas.paste(sample, ((width - sample.width) // 2, (height - sample.height) // 2))
     # Pillow performs these exact bit operations in C, rather than looping over
     # every pixel in Python. The disjoint channel bits add without saturation.
@@ -57,7 +57,7 @@ def rgb565(image, width, height):
     return Image.merge("LA", (low, high)).tobytes()
 
 
-def convert_media(data, animated=False):
+def convert_media(data, animated=False, high_quality=False):
     with Image.open(BytesIO(data)) as image:
         if image.width * image.height > Image.MAX_IMAGE_PIXELS:
             raise ValueError("Oversized image")
@@ -74,7 +74,8 @@ def convert_media(data, animated=False):
         total = sum(durations)
         frames = min(24, max(1, (total + 99) // 100))
         delay = max(100, min(20000, (total + frames - 1) // frames))
-        result = bytearray(struct.pack("<4sHHHH", b"GYM1", 320, 224, frames, delay))
+        width, height = (512, 360) if high_quality else (320, 224)
+        result = bytearray(struct.pack("<4sHHHH", b"GYM1", width, height, frames, delay))
         source_index = 0
         end = durations[0]
         for i in range(frames):
@@ -83,7 +84,7 @@ def convert_media(data, animated=False):
                 source_index += 1
                 end += durations[source_index]
             image.seek(source_index)
-            result.extend(rgb565(image, 320, 224))
+            result.extend(rgb565(image, width, height))
         return bytes(result)
 
 
@@ -94,10 +95,14 @@ def pack_media(raw):
     incompressible content on the packed route.
     """
     compressed = b"GYZ1" + struct.pack("<I", len(raw)) + zlib.compress(raw, 6)
+    # HQ decoding must not retain a near-9 MB wire buffer AND its expansion.
+    # Large, weakly compressible media uses the validated raw transport instead.
+    if len(raw) > 3_500_000 and len(compressed) > 2 * 1024 * 1024:
+        return raw
     return compressed if len(compressed) < len(raw) else raw
 
 
-def convert_video(path):
+def convert_video(path, high_quality=False):
     """Decode one allowlisted local MP4 into the existing bounded GYM1 format.
 
     One open regular-file descriptor prevents symlink/replacement races. No
@@ -126,32 +131,43 @@ def convert_video(path):
             raise ValueError('Video exceeds bounds')
         frames = min(24, max(1, math.ceil(duration * 10)))
         delay = max(100, math.ceil(duration * 1000 / frames))
+        width, height = (512, 360) if high_quality else (320, 224)
+        # Use Pillow's exact contain dimensions and integer centring for HQ video
+        # too. Still/GIF/MP4 then share the same 8 px margin in display pixels.
+        if high_quality:
+            fit = ImageOps.contain(Image.new('1', (int(stream['width']), int(stream['height']))),
+                                   (width - 16, height - 16)).size
+            spatial_filter = (f'scale={fit[0]}:{fit[1]}:flags=lanczos,'
+                              f'pad={width}:{height}:{(width-fit[0])//2}:{(height-fit[1])//2}:color=white')
+        else:
+            spatial_filter = ('scale=304:208:force_original_aspect_ratio=decrease:force_divisible_by=2,'
+                              'pad=320:224:(ow-iw)/2:(oh-ih)/2:color=white')
         # Start at t=0, retaining the whole movement at a bounded frame rate.
         fps = 1000 / delay
         os.lseek(descriptor, 0, os.SEEK_SET)
         result = subprocess.run(
             ['ffmpeg', '-nostdin', *options, '-i', source, '-an', '-sn', '-dn',
              '-filter_threads', '1', '-vf',
-             f'fps=fps={fps:.9f}:start_time=0,'
-             'scale=304:208:force_original_aspect_ratio=decrease:force_divisible_by=2,'
-             'pad=320:224:(ow-iw)/2:(oh-ih)/2:color=white',
+             f'fps=fps={fps:.9f}:start_time=0,' + spatial_filter,
              '-frames:v', str(frames), '-threads:v', '1',
              '-pix_fmt', 'rgb24', '-f', 'rawvideo', 'pipe:1'],
             capture_output=True, check=True, timeout=20, pass_fds=(descriptor,),
         )
-        return video_frames(result.stdout, frames, delay)
+        return video_frames(result.stdout, frames, delay, width, height)
     finally:
         os.close(descriptor)
 
 
-def video_frames(data, maximum_frames, delay):
-    frame_bytes = 320 * 224 * 3
+def video_frames(data, maximum_frames, delay, width=320, height=224):
+    if (width, height) not in {(320, 224), (512, 360)}:
+        raise ValueError('Invalid video canvas')
+    frame_bytes = width * height * 3
     count, remainder = divmod(len(data), frame_bytes)
     if remainder or not 1 <= count <= maximum_frames <= 24:
         raise ValueError('Invalid decoded video frames')
-    result = bytearray(struct.pack('<4sHHHH', b'GYM1', 320, 224, count, delay))
+    result = bytearray(struct.pack('<4sHHHH', b'GYM1', width, height, count, delay))
     for offset in range(0, len(data), frame_bytes):
-        frame = Image.frombytes('RGB', (320, 224), data[offset:offset + frame_bytes])
+        frame = Image.frombytes('RGB', (width, height), data[offset:offset + frame_bytes])
         # No second resize or margins: the decoder already produced the canvas.
         red, green, blue = frame.split()
         low = ImageChops.add(green.point(lambda n: (n >> 2 & 7) << 5), blue.point(lambda n: n >> 3))
@@ -217,11 +233,11 @@ class Adapter:
             json.loads(data)
             return response.code, data
 
-    def media(self, kind, filename, packed=False):
+    def media(self, kind, filename, packed=False, high_quality=False):
         source = ("gif/" if kind == "animation" else "img/") + filename
         if source not in self.allowed and source not in self.modern:
             raise FileNotFoundError("Not catalogue media")
-        key = (kind, filename, packed)
+        key = (kind, filename, packed, high_quality)
         # Serialize conversions and cache ownership, bounding transient RAM/CPU.
         with self.media_lock:
             if key in self.cache:
@@ -235,16 +251,16 @@ class Adapter:
                     draw.rounded_rectangle((x, 110, x + 24, 232), 6, fill="#b8ee56")
                 draw.rectangle((200, 166, 312, 178), fill="#b8ee56")
                 draw.text((256, 274), "No exercise illustration", anchor="mm", fill="white")
-                payload = struct.pack("<4sHHHH", b"GYM1", 512, 360, 1, 0) + rgb565(image, 512, 360)
+                payload = struct.pack("<4sHHHH", b"GYM1", 512, 360, 1, 100 if high_quality and kind == "animation" else 0) + rgb565(image, 512, 360)
             elif source in self.modern:
                 relative = self.modern[source]
                 if not re.fullmatch(r'(?:still/[0-9]+\.webp|clip/[0-9]+\.mp4)', relative):
                     raise ValueError('Invalid pinned media source')
                 path = self.catalogue_media_dir / relative
-                payload = (convert_video(path) if kind == 'animation' else
+                payload = (convert_video(path, high_quality=high_quality) if kind == 'animation' else
                            convert_media(read_regular(path, MEDIA_LIMIT)))
             else:
-                payload = convert_media(read_regular(self.media_dir / source, MEDIA_LIMIT), kind == "animation")
+                payload = convert_media(read_regular(self.media_dir / source, MEDIA_LIMIT), kind == "animation", high_quality=high_quality)
             if packed:
                 payload = pack_media(payload)
             while self.cache and self.cache_bytes + len(payload) > CACHE_LIMIT:
@@ -317,10 +333,14 @@ class Handler(BaseHTTPRequestHandler):
                 return self.reply(error.code if error.code in (400, 401, 404, 409) else 503, b'{"error":"Plan unavailable"}')
             except Exception:
                 return self.reply(503, b'{"error":"Plan unavailable"}')
-        media = re.fullmatch(r"/(native|packed)/(still|animation)/([A-Za-z0-9_-]+\.(?:jpg|png|gif))", self.path)
+        media = re.fullmatch(r"/(native|packed|packed-hq)/(still|animation)/([A-Za-z0-9_-]+\.(?:jpg|png|gif))", self.path)
         if media:
             try:
-                return self.reply(200, self.server.adapter.media(media[2], media[3], packed=media[1] == "packed"), "application/vnd.sollie.gym-rgb565")
+                options = {'packed': media[1] != 'native'}
+                if media[1] == 'packed-hq':
+                    options['high_quality'] = True
+                return self.reply(200, self.server.adapter.media(media[2], media[3], **options),
+                                  "application/vnd.sollie.gym-rgb565")
             except Exception:
                 return self.reply(404, b'{"error":"Media unavailable"}')
         self.reply(404, b'{"error":"Not found"}')

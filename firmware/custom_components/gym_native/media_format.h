@@ -15,7 +15,8 @@ inline bool valid_media(const uint8_t *data, size_t size) {
   };
   const unsigned width = word(4), height = word(6), frames = word(8), delay = word(10);
   const bool still = width == 512 && height == 360 && frames == 1 && delay == 0;
-  const bool animation = width == 320 && height == 224 && frames >= 1 && frames <= 24 &&
+  const bool animation = ((width == 320 && height == 224) ||
+                          (width == 512 && height == 360)) && frames >= 1 && frames <= 24 &&
                          delay >= 100 && delay <= 20000;
   return (still || animation) && size == 12 + size_t(width) * height * frames * 2;
 }

@@ -47,6 +47,19 @@ class MediaCache {
     bytes_ += data->size();
   }
 
+  // Before a large HQ miss, release obsolete cache ownership. The displayed
+  // image and pending handoff retain their independent shared references.
+  void discard_unused() {
+    for (auto it = entries_.begin(); it != entries_.end();) {
+      if (it->data.use_count() == 1) {
+        bytes_ -= it->data->size();
+        it = entries_.erase(it);
+      } else {
+        ++it;
+      }
+    }
+  }
+
   size_t bytes() const { return bytes_; }
   size_t size() const { return entries_.size(); }
 

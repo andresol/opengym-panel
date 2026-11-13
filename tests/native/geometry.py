@@ -217,10 +217,11 @@ assert 'lv_obj_remove_flag(media_viewport_, LV_OBJ_FLAG_OVERFLOW_VISIBLE)' in be
 assert 'lv_obj_remove_flag(media_viewport_, LV_OBJ_FLAG_CLICKABLE)' in begin
 assert 'hidden(media_viewport_, true)' in source
 assert 'const int rendered_width = 512, rendered_height = 360' in source
-assert 'playing_ ? 410 : 256' in source
+assert 'lv_image_set_scale(media_image_, 256)' in source
+assert '410' not in source.split('bool GymNative::accept_media',1)[1].split('void GymNative::show_frame',1)[0]
 assert 'playing_ ? 384 : 256' not in source
 assert 'playing_ ? w * 3 / 2' not in source
-for w,h,scale in [(512,360,256),(320,224,410)]:
+for w,h,scale in [(512,360,256),(512,360,256)]:
     drawn_w,drawn_h=w*scale/256,h*scale/256
     assert abs(drawn_w-512)<1 and abs(drawn_h-360)<2
     assert max(0,(drawn_w-512)/2)<1  # only the source's white margin, not content

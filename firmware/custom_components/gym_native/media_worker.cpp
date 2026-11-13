@@ -32,6 +32,10 @@ void GymNative::media_worker() {
         bool ok = bool(binary);
         if (ok && foreground) ++cache_hits_;
         if (!ok) {
+          if (route.compare(0, 11, "/packed-hq/") == 0) {
+            cache_.discard_unused();
+            cache_bytes_ = cache_.bytes();
+          }
           if (foreground) ++media_downloads_; else ++prefetch_downloads_;
           auto download = std::make_shared<MediaBuffer>();
           std::string body;

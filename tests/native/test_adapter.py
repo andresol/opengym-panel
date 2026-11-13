@@ -38,6 +38,43 @@ class NativeAdapterTests(unittest.TestCase):
         self.assertTrue(1 <= count <= 24 and delay >= 100)
         self.assertEqual(len(output), 12 + width * height * count * 2)
 
+    def test_hq_still_and_animation_have_identical_pixels_and_margins(self):
+        # This catches the actual old bug: an 8 px small-frame margin became
+        # ~13 px after panel enlargement, making the subject visibly shrink.
+        for dimensions in [(720, 480), (360, 640), (640, 360), (100, 100)]:
+            with self.subTest(dimensions=dimensions):
+                image = module.Image.new('RGB', dimensions, 'white')
+                image.paste('red', (dimensions[0] // 8, dimensions[1] // 8,
+                                    dimensions[0] * 7 // 8, dimensions[1] * 7 // 8))
+                encoded = BytesIO()
+                image.save(encoded, format='GIF', duration=300)
+                still = module.convert_media(encoded.getvalue())
+                animation = module.convert_media(encoded.getvalue(), True, high_quality=True)
+                magic, width, height, count, delay = struct.unpack('<4sHHHH', animation[:12])
+                self.assertEqual((magic, width, height, count, delay), (b'GYM1', 512, 360, 3, 100))
+                size = width * height * 2
+                for frame in range(count):
+                    self.assertEqual(animation[12 + frame * size:12 + (frame + 1) * size], still[12:])
+
+    def test_hq_preserves_movement_sampling_and_transport_memory_bound(self):
+        frames = [module.Image.new('RGB', (40, 40), color) for color in ['red', 'blue']]
+        encoded = BytesIO()
+        frames[0].save(encoded, format='GIF', save_all=True, append_images=frames[1:],
+                       duration=1800, loop=0)
+        old = module.convert_media(encoded.getvalue(), True)
+        hq = module.convert_media(encoded.getvalue(), True, high_quality=True)
+        self.assertEqual(struct.unpack('<4sHHHH', hq[:12]), (b'GYM1', 512, 360, 24, 150))
+        self.assertEqual(hq[8:12], old[8:12])  # No motion/frame-rate downgrade.
+        self.assertEqual(len(hq), 8_847_372)
+        self.assertEqual(hq[12:14], b'\xff\xff')
+        packed = module.pack_media(hq)
+        self.assertLess(len(packed), 2 * 1024 * 1024)
+        self.assertEqual(zlib.decompress(packed[8:]), hq)
+        # A large weakly compressible wire body must not coexist with another
+        # equally large expansion on PSRAM. Raw is validated without a copy.
+        noisy = random.Random(43).randbytes(3_600_000)
+        self.assertIs(module.pack_media(noisy), noisy)
+
     def test_fast_rgb565_preserves_all_channel_bits(self):
         randomizer = random.Random(42)
         image = module.Image.new('RGB', (32, 32))
@@ -80,8 +117,8 @@ class NativeAdapterTests(unittest.TestCase):
 
             adapter.plan = plan
             media_calls = []
-            def media(kind, filename, packed=False):
-                media_calls.append((kind, filename, packed))
+            def media(kind, filename, packed=False, high_quality=False):
+                media_calls.append((kind, filename, packed, high_quality))
                 if filename == 'known.png': return b'GYZ1' + b'fake-payload'
                 raise FileNotFoundError()
             adapter.media = media
@@ -103,9 +140,12 @@ class NativeAdapterTests(unittest.TestCase):
                 self.assertEqual(get('/health', False)[0], 200)
                 self.assertEqual(get('/packed/still/known.png', False)[0], 401)
                 self.assertEqual(get('/packed/still/known.png')[0], 200)
-                self.assertEqual(media_calls[-1], ('still', 'known.png', True))
+                self.assertEqual(media_calls[-1], ('still', 'known.png', True, False))
                 self.assertEqual(get('/native/still/known.png')[0], 200)
-                self.assertEqual(media_calls[-1], ('still', 'known.png', False))
+                self.assertEqual(media_calls[-1], ('still', 'known.png', False, False))
+                self.assertEqual(get('/packed-hq/animation/known.png', False)[0], 401)
+                self.assertEqual(get('/packed-hq/animation/known.png')[0], 200)
+                self.assertEqual(media_calls[-1], ('animation', 'known.png', True, True))
                 self.assertEqual(get('/api/profiles', False)[0], 401)
                 code, response = get('/api/profiles/blair/plan?day=2')
                 self.assertEqual(code, 200)

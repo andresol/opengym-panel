@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.34-community.1 — Consistent exercise animation size
+
+- Still images and animation now use the same 512 × 360 canvas, 8 px margins
+  and 1:1 rendering; tapping the artwork no longer changes its scale.
+- HQ GIF/MP4 conversion retains the existing movement duration and frame count,
+  uses Lanczos resizing and avoids enlarging a 320 × 224 animation.
+- The HQ route is opt-in; older firmware retains its compatible media routes.
+- PSRAM/cache reclamation and packed-transfer limits bound the larger frames.
+
+
 ## 1.1.33-community.2 — English by default
 
 - New community installations default to English across setup, firmware and companion.

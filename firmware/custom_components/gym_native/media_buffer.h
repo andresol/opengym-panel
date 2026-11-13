@@ -17,7 +17,7 @@ namespace esphome::gym_native {
 class MediaBuffer {
  public:
   using Allocate = void *(*)(size_t);
-  static constexpr size_t MAX_BYTES = 3500000;
+  static constexpr size_t MAX_BYTES = 12 + size_t(512) * 360 * 24 * 2;
   static constexpr size_t PREFIX = 64 - 12;
 
   bool allocate(size_t bytes, Allocate allocator = default_allocate) {

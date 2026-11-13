@@ -117,6 +117,11 @@ class PublicInstallTests(unittest.TestCase):
                     self.assertEqual(struct.unpack('<4sHHHH', raw[:12]), (b'GYM1', 512, 360, 1, 0))
                     self.assertEqual(len(raw), 12 + 512 * 360 * 2)
                     self.assertIs(payload, adapter.media(kind, name, packed=True))
+                    hq = adapter.media(kind, name, packed=True, high_quality=True)
+                    raw_hq = zlib.decompress(hq[8:]) if hq[:4] == b'GYZ1' else hq
+                    self.assertEqual(struct.unpack('<4sHHHH', raw_hq[:12]),
+                                     (b'GYM1', 512, 360, 1, 100 if kind == 'animation' else 0))
+
             with self.assertRaises(FileNotFoundError):
                 adapter.media('still', '../private.jpg')
 

@@ -7,7 +7,7 @@ picking up your phone.
 Built for the Guition JC8012P4A1 v3, with an ESP32-P4 and a 1280×800 display.
 This is an independent companion project.
 
-**Status:** Early community release (`1.1.33-community.2`). The training workflow
+**Status:** Early community release (`1.1.34-community.1`). The training workflow
 is in use on one panel; the installer and community firmware still need testing
 on other setups.
 

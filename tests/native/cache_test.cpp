@@ -38,6 +38,22 @@ int main() {
   assert(count_bound.size() == MediaCache::ENTRY_LIMIT);
   assert(!count_bound.find("0") && count_bound.find("99"));
 
+  // HQ downloads reclaim only unreferenced cache entries. Never release the
+  // currently displayed buffer, even when the cache sheds its stale frames.
+  MediaCache hq_cache;
+  auto visible = media(12 + 512 * 360 * 2);
+  hq_cache.put("visible", visible);
+  hq_cache.put("obsolete", media(MediaBuffer::MAX_BYTES));
+  hq_cache.discard_unused();
+  assert(hq_cache.size() == 1 && hq_cache.find("visible") == visible);
+  assert(!hq_cache.find("obsolete") && visible->size() > 12);
+  auto animation = media(MediaBuffer::MAX_BYTES);
+  const uint8_t hq_header[] = {'G', 'Y', 'M', '1', 0, 2, 104, 1, 24, 0, 150, 0};
+  std::memcpy(animation->data(), hq_header, 12);
+  assert(valid_media(animation->data(), animation->size()));
+  animation->data()[8] = 25;
+  assert(!valid_media(animation->data(), animation->size()));
+
   auto still = media(12 + 512 * 360 * 2);
   const uint8_t header[] = {'G', 'Y', 'M', '1', 0, 2, 104, 1, 1, 0, 0, 0};
   std::memcpy(still->data(), header, 12);
