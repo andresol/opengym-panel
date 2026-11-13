@@ -1,6 +1,6 @@
 # Native interface documentation renders
 
-`workout.png` and `profiles.png` are 1280×800 offline LVGL desktop renders.
+`workout.png` and `profiles.png` are 1280×800 offline LVGL desktop renders in English.
 The panel's native widget construction/render methods and bundled font are used.
 Profile names, workout values, date and session state are fictional. They are
 not photographs, physical framebuffer captures or hardware-acceptance evidence.

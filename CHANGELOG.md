@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.33-community.2 — English by default
+
+- New community installations default to English across setup, firmware and companion.
+- README screenshots now show the native English interface with example data.
+- Explicit Norwegian (`--language nb`) and existing installation settings are preserved.
+- No changes to set logging, workout storage or the installed maintainer panel.
+
 
 ## 1.1.33-community.1 — English language support
 

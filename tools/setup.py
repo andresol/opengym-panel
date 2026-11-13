@@ -158,7 +158,8 @@ def parser():
     result.add_argument("--bind-address", required=True)
     result.add_argument("--output", required=True)
     result.add_argument("--timezone", default="Europe/Oslo")
-    result.add_argument("--language", choices=['nb', 'en'], default='nb')
+    result.add_argument("--language", choices=['nb', 'en'], default='en',
+                        help='Interface language (default: en)')
     result.add_argument("--uid", type=int, default=os.getuid() or 1000)
     result.add_argument("--gid", type=int, default=os.getgid() or 1000)
     return result

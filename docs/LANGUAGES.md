@@ -1,8 +1,10 @@
 # Interface languages
 
-The native panel supports Norwegian Bokmål (`nb`) and English (`en`). Norwegian
-is the default. The same choice is used for the touchscreen, its local settings
-page and the session companion's generated workout text.
+The native panel supports English (`en`) and Norwegian Bokmål (`nb`). English
+is the default for new community installations; the private edition keeps
+Norwegian. Existing explicit language settings are never migrated automatically.
+The same choice is used for the touchscreen, its local settings page and the
+session companion's generated workout text.
 
 The language is an installation setting, not a touchscreen toggle. Changing it
 requires rebuilding the panel firmware and updating the session companion's
@@ -10,7 +12,7 @@ environment. It does not change OpenGym's own language setting or your units.
 
 ## New installation
 
-In the community checkout, add `--language en` to the `tools/setup.py` command
+In the community checkout, use the `tools/setup.py` command
 in the [installation guide](https://github.com/andresol/opengym-panel/blob/main/docs/INSTALL.md). Setup writes the chosen language to the
 companion's `PANEL_LANGUAGE` environment and to the generated private
 `installation.json`.
@@ -22,8 +24,9 @@ python3 tools/configure_installation.py \
   --config /srv/opengym-panel/installation.json --name my-gym
 ```
 
-Build `firmware/my-gym.local.yaml` using your private provisioning. Use
-`--language nb`, or omit the option, for Norwegian.
+Build `firmware/my-gym.local.yaml` using your private provisioning. Community
+setup selects English when no language option is supplied. Use `--language nb`
+for Norwegian.
 
 ## Existing installation
 

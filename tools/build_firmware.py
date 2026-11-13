@@ -27,14 +27,14 @@ if __name__ == "__main__":
     parser.add_argument("--synthetic", action="store_true", help="Build isolated, non-installable CI firmware")
     parser.add_argument("--config-only", action="store_true")
     parser.add_argument("--entry", default="firmware/opengym-v3.yaml")
-    parser.add_argument("--language", choices=['nb', 'en'], default='nb',
+    parser.add_argument("--language", choices=['nb', 'en'], default=None,
                         help="Language for the isolated synthetic build; real builds use their installation config")
     args = parser.parse_args()
     version = subprocess.check_output(["esphome", "version"], text=True).strip()
     if version != "Version: 2026.10.0":
         raise SystemExit("Use ESPHome 2026.10.0 from requirements-firmware.txt")
     if not args.synthetic:
-        if args.language != 'nb':
+        if args.language is not None:
             raise SystemExit("Real builds use locale.language in the installation wrapper, not --language")
         entry = (ROOT / args.entry).resolve(strict=True)
         if not entry.is_relative_to(ROOT / "firmware"):
@@ -45,6 +45,8 @@ if __name__ == "__main__":
         raise SystemExit(0)
     if args.entry != "firmware/opengym-v3.yaml":
         raise SystemExit("Synthetic CI uses only the generic supported V3 entry")
+    if args.language is None:
+        args.language = json.loads((ROOT / 'firmware/config/installation.defaults.json').read_text())['substitutions']['panel_language']
     with tempfile.TemporaryDirectory(prefix="opengym-public-compile-") as temporary:
         scratch = Path(temporary)
         shutil.copytree(ROOT / "firmware", scratch / "firmware",

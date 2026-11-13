@@ -2,13 +2,13 @@
   "schema": 1,
   "images": {
     "docs/images/profiles.png": {
-      "sha256": "fbe3ba6d845f90abb87e40a8237fa67cced5e962249b6efc7bd3d9701542b1f2",
+      "sha256": "edbe0e56dafb64376f4621485ebf8f3d40e239ce45274c4d2e75c2ac9f28c340",
       "width": 1280,
       "height": 800,
       "kind": "synthetic-native-lvgl-desktop-render"
     },
     "docs/images/workout.png": {
-      "sha256": "483e446d7672b5e8b81656dea3a4bfc23b54c50677d8cb49d4e895aecf18017a",
+      "sha256": "542950c3b18cf893825b026c6c5cfa0a82bdc1725cf8139ce4e1aca99428ce0e",
       "width": 1280,
       "height": 800,
       "kind": "synthetic-native-lvgl-desktop-render",
@@ -33,7 +33,7 @@
   "real_user_data_in_synthetic_renders": false,
   "authorized_real_photo_included": false,
   "hardware_framebuffer_capture": false,
-  "language": "nb",
+  "language": "en",
   "network_access": false,
   "restricted_exercise_media_visible": true,
   "standalone_restricted_media_included": false

@@ -1,11 +1,11 @@
 {
   "name": "opengym-panel",
-  "version": "1.1.33-community.1",
+  "version": "1.1.33-community.2",
   "private": true,
   "type": "module",
   "license": "AGPL-3.0-or-later",
   "scripts": {
-    "test": "node --test tests/*.test.mjs",
+    "test": "PANEL_LANGUAGE=nb node --test tests/*.test.mjs",
     "start": "node preview/server.mjs",
     "start:legacy": "node bridge/server.mjs",
     "test:client": "node tests/preview-client.cjs && node tests/admin-client.cjs",

@@ -20,7 +20,10 @@ class InstallationTests(unittest.TestCase):
 
     def test_installed_compatibility_keeps_all_defaults_and_existing_service_credentials(self):
         c = m.validate(self.compat)
-        self.assertEqual(c['substitutions'], m.DEFAULTS)
+        expected = {**m.DEFAULTS,
+                    'panel_language': self.compat['locale']['language'],
+                    'panel_friendly_name': self.compat['device']['friendly_name']}
+        self.assertEqual(c['substitutions'], expected)
         self.assertEqual(c['network_mode'], 'static')
         text, env = m.render(c)
         self.assertIn('manual_ip:', text)
@@ -48,6 +51,16 @@ class InstallationTests(unittest.TestCase):
         self.assertIn('panel_language: "en"', text)
         self.assertIn('PANEL_LANGUAGE="en"', env)
         self.assertEqual(config['substitutions']['panel_timezone'], m.DEFAULTS['panel_timezone'])
+
+    def test_omitted_locale_uses_edition_default_and_explicit_languages_survive(self):
+        config = m.validate({'schema': 1})
+        self.assertEqual(config['substitutions']['panel_language'], m.DEFAULTS['panel_language'])
+        for language in ['en', 'nb']:
+            with self.subTest(language=language):
+                explicit = m.validate({'schema': 1, 'locale': {'language': language}})
+                wrapper, env = m.render(explicit)
+                self.assertIn('panel_language: "' + language + '"', wrapper)
+                self.assertIn('PANEL_LANGUAGE="' + language + '"', env)
 
     def test_invalid_configuration_rejected_before_output(self):
         mutations = [lambda c:c.update(schema=True), lambda c:c.update(secret='x'),

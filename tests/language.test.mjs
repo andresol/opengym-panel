@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { readFileSync } from 'node:fs';
 
 const cwd = fileURLToPath(new URL('..', import.meta.url));
 
@@ -60,4 +61,17 @@ test('English localizes planned, active and rest views without changing user tex
   assert.deepEqual(en.savedSets, nb.savedSets);
   assert.deepEqual(en.savedRoutines, nb.savedRoutines);
   assert.equal(en.savedName, 'Min egen økt');
+});
+
+
+test('unset backend language matches edition firmware default; explicit Norwegian remains available', () => {
+  const defaults = JSON.parse(readFileSync(new URL('../firmware/config/installation.defaults.json', import.meta.url)));
+  const env = { ...process.env };
+  delete env.PANEL_LANGUAGE;
+  const result = spawnSync(process.execPath, ['--input-type=module', '-e',
+    "import { LANGUAGE } from './bridge/language.mjs'; console.log(LANGUAGE);"],
+    { cwd, env, encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.stdout.trim(), defaults.substitutions.panel_language);
+  assert.equal(project('nb').preview.language, 'nb');
 });

@@ -28,7 +28,6 @@ python3 tools/setup.py \
   --api-url http://host.docker.internal:8888 \
   --panel-url http://192.0.2.10:8893 \
   --bind-address 192.0.2.10 \
-  --language nb \
   --output /srv/opengym-panel \
   --uid 1000 --gid 1000
 ```
@@ -36,8 +35,8 @@ python3 tools/setup.py \
 Run this in your source checkout **on the companion host**; generated build
 contexts point to that checkout. It does not send data or start anything.
 It creates mode-0600 service configs, a fresh ESPHome secrets file, a Compose
-file and an `installation.json` with matching language/timezone settings. Choose
-`--language en` for English, or `nb` (the default) for Norwegian Bokmål.
+file and an `installation.json` with matching language/timezone settings.
+English is the default; choose `--language nb` for Norwegian Bokmål.
 The output directory must not already exist. Running as root assigns the
 new files to the selected non-root UID/GID; without root use your own UID/GID.
 Nothing changes ownership or permissions in OpenGym's data directory.
@@ -72,7 +71,7 @@ values are already unique and match the companions. Copy it privately to
 `firmware/secrets.yaml` in your checkout; it is Git-ignored and excluded from the
 Docker build context. The file also holds your browser-admin password.
 
-The base firmware uses DHCP, Europe/Oslo time and Norwegian. Generate a wrapper
+The base firmware uses DHCP, Europe/Oslo time and English. Generate a wrapper
 from setup's private `installation.json` to use the same language and timezone
 as the companion. For additional device/network choices, use a private copy of
 `config/installation.example.json`:

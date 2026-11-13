@@ -2,11 +2,11 @@
   "schema": 1,
   "device": {
     "name": "gym-panel",
-    "friendly_name": "Treningsskjerm"
+    "friendly_name": "Training panel"
   },
   "locale": {
     "timezone": "Europe/Oslo",
-    "language": "nb"
+    "language": "en"
   },
   "network": {
     "mode": "dhcp"
